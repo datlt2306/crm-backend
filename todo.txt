@@ -25,6 +25,9 @@ GET    /activities/:id/feedback   // Lấy danh sách feedback
 POST   /activities/:id/resources  // Đính kèm tài liệu, link tham gia, link khảo sát
 GET    /activities/:id/resources  // Lấy tài nguyên hoạt động
 
+// multi 
+
+
 // Đăng ký tham gia (event)
 POST   /activities/:id/register   // Sinh viên đăng ký tham gia hoạt động
 GET    /activities/:id/attendance // Lấy danh sách điểm danh/tham dự
