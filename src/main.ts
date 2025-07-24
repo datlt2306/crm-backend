@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory, Reflector } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
@@ -24,9 +25,12 @@ import { AuditInterceptor } from './interceptors/audit.interceptor';
 import setupSwagger from './utils/setup-swagger';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     bufferLogs: true,
   });
+
+  // Set trust proxy to true for rate limiting to work correctly with reverse proxies
+  app.set('trust proxy', 1);
 
   app.useLogger(app.get(Logger));
 
@@ -44,8 +48,8 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService<AllConfigType>);
   const reflector = app.get(Reflector);
-  const isDevelopment =
-    configService.getOrThrow('app.nodeEnv', { infer: true }) === 'development';
+  // const isDevelopment =
+  //   configService.getOrThrow('app.nodeEnv', { infer: true }) === 'development';
   const corsOrigin = configService.getOrThrow('app.corsOrigin', {
     infer: true,
   });
@@ -92,9 +96,7 @@ async function bootstrap() {
     new AuditInterceptor(),
   );
 
-  if (isDevelopment) {
-    setupSwagger(app);
-  }
+  setupSwagger(app);
 
   await app.listen(configService.getOrThrow('app.port', { infer: true }));
 
