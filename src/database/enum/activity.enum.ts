@@ -28,3 +28,10 @@ export enum ParticipantRole {
   EXECUTOR = 'executor',
   PARTICIPANT = 'participant',
 }
+
+export enum ActivityStatus {
+  NEW = 'NEW',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  OVERDUE = 'OVERDUE',
+}

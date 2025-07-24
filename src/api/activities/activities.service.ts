@@ -1,4 +1,5 @@
 import { OffsetPaginatedDto } from '@/common/dto/offset-pagination/paginated.dto';
+import { Uuid } from '@/common/types/common.type';
 import { BaseService } from '@/services/base.service';
 import { paginate } from '@/utils/offset-pagination';
 import { Injectable } from '@nestjs/common';
@@ -8,6 +9,7 @@ import { Repository } from 'typeorm';
 import { ActivityResDto } from './dto/activity.res.dto';
 import { CreateActivityDto } from './dto/create-activity.dto';
 import { QueryActivityDto } from './dto/query-activity.dto';
+import { UpdateActivityStatusDto } from './dto/update-activity-status.dto';
 import { ActivityEntity } from './entities/activity.entity';
 
 @Injectable()
@@ -78,5 +80,10 @@ export class ActivitiesService extends BaseService<ActivityEntity> {
       plainToInstance(ActivityResDto, activities),
       metaDto,
     );
+  }
+  async updateStatus(id: Uuid, dto: UpdateActivityStatusDto) {
+    const activity = await this.activityRepo.findOneOrFail({ where: { id } });
+    activity.status = dto.status;
+    return this.activityRepo.save(activity);
   }
 }

@@ -3,6 +3,7 @@ import { AbstractEntity } from '@/database/entities/abstract.entity';
 import {
   ActivityCategory,
   ActivityPiority,
+  ActivityStatus,
   ActivityType,
 } from '@/database/enum/activity.enum';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
@@ -45,6 +46,8 @@ export class ActivityEntity extends AbstractEntity {
 
   @Column({ type: 'enum', enum: ActivityCategory, nullable: true })
   category?: ActivityCategory;
+  @Column({ type: 'enum', enum: ActivityStatus, default: ActivityStatus.NEW })
+  status: ActivityStatus;
 
   // @OneToMany(
   //   () => ActivityParticipantEntity,
