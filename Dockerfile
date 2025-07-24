@@ -67,4 +67,4 @@ COPY --chown=node:node --from=builder /app/package.json ./
 USER node
 
 # Start the server using the production build
-CMD [ "node", "dist/main.js" ]
+CMD ["sh", "-c", "node dist/scripts/init-keys.js && node dist/main.js"]
