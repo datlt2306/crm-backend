@@ -1,0 +1,37 @@
+DANH SÁCH API CHO MODULE ACTIVITIES (TASK & EVENT)
+
+// CRUD cơ bản
+POST   /activities                // Tạo mới activity (task/event) (done)
+GET    /activities                // Lấy danh sách activities (filter theo type, trạng thái, thời gian, người tham gia, v.v.)
+GET    /activities/:id            // Lấy chi tiết activity
+PATCH  /activities/:id            // Cập nhật activity
+DELETE /activities/:id            // Xóa activity
+
+// Phân công công việc (task)
+PATCH  /activities/:id/assign     // Phân công giảng viên thực hiện task (danh sách userId)
+PATCH  /activities/:id/status     // Cập nhật trạng thái công việc (mới, đang thực hiện, hoàn thành, trễ hạn)
+POST   /activities/:id/files      // Đính kèm file cho activity
+GET    /activities/:id/files      // Lấy danh sách file đính kèm
+
+// Quản lý người tham gia (event)
+PATCH  /activities/:id/participants // Thêm/bớt giảng viên, sinh viên tham gia hoạt động
+GET    /activities/:id/participants // Lấy danh sách người tham gia
+
+// Feedback & phản hồi
+POST   /activities/:id/feedback   // Gửi phản hồi/feedback cho activity
+GET    /activities/:id/feedback   // Lấy danh sách feedback
+
+// Quản lý tài nguyên hoạt động
+POST   /activities/:id/resources  // Đính kèm tài liệu, link tham gia, link khảo sát
+GET    /activities/:id/resources  // Lấy tài nguyên hoạt động
+
+// Đăng ký tham gia (event)
+POST   /activities/:id/register   // Sinh viên đăng ký tham gia hoạt động
+GET    /activities/:id/attendance // Lấy danh sách điểm danh/tham dự
+
+// Báo cáo & tổng hợp
+GET    /activities/:id/report     // Xuất báo cáo, tổng hợp dữ liệu hoạt động/task
+
+// Nhắc nhở & thông báo
+POST   /activities/:id/notify     // Gửi thông báo cho người tham gia (email/in-app)
+GET    /activities/overdue        // Lấy danh sách công việc trễ
