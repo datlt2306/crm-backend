@@ -6,6 +6,7 @@ import { HealthModule } from './health/health.module';
 import { HomeModule } from './home/home.module';
 import { StagesModule } from './stages/stages.module';
 import { UserModule } from './users/user.module';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { UserModule } from './users/user.module';
     HealthModule,
     StagesModule,
     ActivitiesModule,
+    UploadModule,
   ],
 })
 export class ApiModule {}

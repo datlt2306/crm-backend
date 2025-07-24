@@ -11,8 +11,13 @@ export class OffsetPaginatedDto<TData> {
   @Expose()
   pagination: OffsetPaginationDto;
 
+  @ApiProperty()
+  @Expose()
+  timestamp: Date;
+
   constructor(data: TData[], meta: OffsetPaginationDto) {
     this.data = data;
     this.pagination = meta;
+    this.timestamp = new Date();
   }
 }

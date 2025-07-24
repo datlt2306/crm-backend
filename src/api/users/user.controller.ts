@@ -1,5 +1,4 @@
 import { PageOptionsDto } from '@/common/dto/offset-pagination/page-options.dto';
-import { OffsetPaginatedDto } from '@/common/dto/offset-pagination/paginated.dto';
 import { Uuid } from '@/common/types/common.type';
 import { UserRole } from '@/database/enum/user.enum';
 import { ApiAuth, ApiPublic } from '@/decorators/http.decorators';
@@ -19,7 +18,6 @@ import {
 import { ApiParam, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from './dto/create-user.dto';
 import { QueryUserDto } from './dto/query-user.tdo';
-import { UserResDto } from './dto/user.res.dto';
 import { UserService } from './user.service';
 
 @ApiTags('users')
@@ -47,9 +45,7 @@ export class UserController {
   @Roles(UserRole.TM, UserRole.CNBM)
   @UseGuards(RolesGuard)
   @Get('all')
-  findAll(
-    @Query() query: PageOptionsDto,
-  ): Promise<OffsetPaginatedDto<UserResDto>> {
+  findAll(@Query() query: PageOptionsDto) {
     return this.userService.findAll(query);
   }
 

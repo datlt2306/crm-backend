@@ -15,6 +15,7 @@ import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import { Logger } from 'nestjs-pino';
+import { join } from 'path';
 import { AuthService } from './api/auth/auth.service';
 import { UserService } from './api/users/user.service';
 import { AppModule } from './app.module';
@@ -45,11 +46,10 @@ async function bootstrap() {
 
   // Rate limiting middleware
   app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
+  app.useStaticAssets(join(process.cwd(), 'uploads'), { prefix: '/uploads/' });
 
   const configService = app.get(ConfigService<AllConfigType>);
   const reflector = app.get(Reflector);
-  // const isDevelopment =
-  //   configService.getOrThrow('app.nodeEnv', { infer: true }) === 'development';
   const corsOrigin = configService.getOrThrow('app.corsOrigin', {
     infer: true,
   });

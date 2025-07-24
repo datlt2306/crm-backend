@@ -4,6 +4,7 @@ import {
   ActivityStatus,
   ActivityType,
 } from '@/database/enum/activity.enum';
+import { ClassField } from '@/decorators/field.decorators';
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose, Type } from 'class-transformer';
 import { ActivityFeedbackResDto } from './activity-feedback.res.dto';
@@ -88,7 +89,9 @@ export class ActivityResDto {
 
   @ApiProperty({ type: () => [ActivityParticipantResDto], required: false })
   @Expose()
-  @Type(() => ActivityParticipantResDto)
+  @ClassField(() => ActivityParticipantResDto, {
+    isArray: true,
+  })
   participants?: ActivityParticipantResDto[];
 
   @ApiProperty({ type: () => [ActivityFileResDto], required: false })

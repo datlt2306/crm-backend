@@ -1,15 +1,21 @@
 import { OffsetPaginatedDto } from '@/common/dto/offset-pagination/paginated.dto';
+import { ResponseNoDataDto } from '@/common/dto/response/response-no-data.dto';
+import { ResponseDto } from '@/common/dto/response/response.dto';
 import { Uuid } from '@/common/types/common.type';
 import { BaseService } from '@/services/base.service';
 import { paginate } from '@/utils/offset-pagination';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
 import { Repository } from 'typeorm';
 import { ActivityResDto } from './dto/activity.res.dto';
+import { AttachFileDto } from './dto/attach-file.dto';
+import { AttachFileResDto } from './dto/attach-file.res.dto';
 import { CreateActivityDto } from './dto/create-activity.dto';
 import { QueryActivityDto } from './dto/query-activity.dto';
 import { UpdateActivityStatusDto } from './dto/update-activity-status.dto';
+import { UpdateActivityDto } from './dto/update-activity.dto';
+import { ActivityFileEntity } from './entities/activity-file.entity';
 import { ActivityEntity } from './entities/activity.entity';
 
 @Injectable()
@@ -17,13 +23,38 @@ export class ActivitiesService extends BaseService<ActivityEntity> {
   constructor(
     @InjectRepository(ActivityEntity)
     private readonly activityRepo: Repository<ActivityEntity>,
+
+    @InjectRepository(ActivityFileEntity)
+    private readonly activityFileRepo: Repository<ActivityFileEntity>,
   ) {
     super(activityRepo);
   }
 
-  async create(dto: CreateActivityDto): Promise<ActivityEntity> {
+  async create(dto: CreateActivityDto): Promise<ResponseDto<ActivityResDto>> {
+    if (dto.type === 'event') {
+      if (!dto.startTime || !dto.endTime || !dto.location) {
+        throw new BadRequestException(
+          'Event phải có startTime, endTime, location',
+        );
+      }
+    }
+    // if (dto.type === 'task') {
+    //   if (dto.startTime || dto.endTime || dto.location) {
+    //     throw new BadRequestException(
+    //       'Task không được truyền startTime, endTime, location',
+    //     );
+    //   }
+    // }
+
     const activity = this.activityRepo.create(dto);
-    return await this.activityRepo.save(activity);
+    const res = await this.activityRepo.save(activity);
+
+    return new ResponseDto<ActivityResDto>({
+      data: plainToInstance(ActivityResDto, res, {
+        excludeExtraneousValues: true,
+      }),
+      message: 'Activity created successfully',
+    });
   }
 
   async findAll(
@@ -88,5 +119,97 @@ export class ActivitiesService extends BaseService<ActivityEntity> {
     const activity = await this.activityRepo.findOneOrFail({ where: { id } });
     activity.status = dto.status;
     return this.activityRepo.save(activity);
+  }
+
+  async findById(id: Uuid): Promise<ResponseDto<ActivityResDto>> {
+    const activity = await this.activityRepo.findOneOrFail({
+      where: { id },
+      relations: [
+        'participants',
+        'participants.user',
+        'files',
+        'feedbacks',
+        'feedbacks.user',
+      ],
+    });
+    return new ResponseDto<ActivityResDto>({
+      data: plainToInstance(ActivityResDto, activity, {
+        excludeExtraneousValues: true,
+      }),
+      message: 'Activity retrieved successfully',
+    });
+  }
+
+  async deleteActivity(id: Uuid): Promise<ResponseNoDataDto> {
+    await this.activityRepo.delete(id);
+    //TODO: handle clear file manualy here
+    return new ResponseNoDataDto({
+      message: 'Activity deleted successfully',
+    });
+  }
+
+  async updateActivity(
+    id: Uuid,
+    dto: UpdateActivityDto,
+  ): Promise<ResponseDto<ActivityResDto>> {
+    const activity = await this.activityRepo.findOneOrFail({ where: { id } });
+    Object.assign(activity, dto);
+    await this.activityRepo.save(activity);
+    return new ResponseDto<ActivityResDto>({
+      data: plainToInstance(ActivityResDto, activity, {
+        excludeExtraneousValues: true,
+      }),
+      message: 'Activity updated successfully',
+    });
+  }
+
+  async attachFile(
+    id: Uuid,
+    dto: AttachFileDto,
+  ): Promise<ResponseDto<ActivityResDto>> {
+    return await this.activityRepo.manager.transaction(async (manager) => {
+      // Tạo file entity mới
+      const activityFile = manager.create(ActivityFileEntity, {
+        activityId: id, // Chỉ cần set foreign key
+        fileUrl: dto.fileUrl,
+        fileName: dto.fileName,
+      });
+
+      // Save file
+      await this.activityFileRepo.save(activityFile);
+
+      // Load lại activity với files để trả về response
+      const updatedActivity = await manager.findOneOrFail(ActivityEntity, {
+        where: { id },
+        relations: ['files'],
+      });
+
+      return new ResponseDto<ActivityResDto>({
+        data: plainToInstance(ActivityResDto, updatedActivity, {
+          excludeExtraneousValues: true,
+        }),
+        message: 'File attached successfully',
+      });
+    });
+  }
+
+  async getFiles(id: Uuid): Promise<ResponseDto<AttachFileResDto[]>> {
+    const files = await this.activityFileRepo.find({
+      where: { activityId: id },
+    });
+
+    if (files.length === 0) {
+      return new ResponseDto<AttachFileResDto[]>({
+        data: [],
+        message: 'No files found for this activity',
+      });
+    }
+
+    return new ResponseDto<AttachFileResDto[]>({
+      data: plainToInstance(AttachFileResDto, files, {
+        excludeExtraneousValues: true,
+      }),
+      message: 'Files retrieved successfully',
+    });
   }
 }
