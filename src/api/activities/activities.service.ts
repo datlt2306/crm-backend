@@ -27,8 +27,13 @@ export class ActivitiesService extends BaseService<ActivityEntity> {
   async findAll(
     query: QueryActivityDto,
   ): Promise<OffsetPaginatedDto<ActivityResDto>> {
-    const qb = this.activityRepo.createQueryBuilder('activity');
-
+    const qb = this.activityRepo
+      .createQueryBuilder('activity')
+      .leftJoinAndSelect('activity.participants', 'participants')
+      .leftJoinAndSelect('participants.user', 'user')
+      .leftJoinAndSelect('activity.files', 'files')
+      .leftJoinAndSelect('activity.feedbacks', 'feedbacks')
+      .leftJoinAndSelect('feedbacks.user', 'feedbackUser');
     if (query.q) {
       qb.andWhere(
         'activity.name ILIKE :search OR activity.description ILIKE :search',

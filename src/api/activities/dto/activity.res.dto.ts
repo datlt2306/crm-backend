@@ -4,7 +4,10 @@ import {
   ActivityType,
 } from '@/database/enum/activity.enum';
 import { ApiProperty } from '@nestjs/swagger';
-import { Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
+import { ActivityFeedbackResDto } from './activity-feedback.res.dto';
+import { ActivityFileResDto } from './activity-file.res.dto';
+import { ActivityParticipantResDto } from './activity-participant.res.dto';
 
 export class ActivityResDto {
   @ApiProperty({ example: '72e7e64a-b8d7-436c-a2cd-cff34c450fa0' })
@@ -77,4 +80,19 @@ export class ActivityResDto {
   @ApiProperty({ example: '2025-07-20T08:43:00.230Z' })
   @Expose()
   updatedAt: Date;
+
+  @ApiProperty({ type: () => [ActivityParticipantResDto], required: false })
+  @Expose()
+  @Type(() => ActivityParticipantResDto)
+  participants?: ActivityParticipantResDto[];
+
+  @ApiProperty({ type: () => [ActivityFileResDto], required: false })
+  @Expose()
+  @Type(() => ActivityFileResDto)
+  files?: ActivityFileResDto[];
+
+  @ApiProperty({ type: () => [ActivityFeedbackResDto], required: false })
+  @Expose()
+  @Type(() => ActivityFeedbackResDto)
+  feedbacks?: ActivityFeedbackResDto[];
 }

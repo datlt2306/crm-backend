@@ -18,11 +18,7 @@ export class ActivityEntity extends AbstractEntity {
   @Column({ type: 'text', nullable: true })
   description?: string;
 
-  @Column({
-    type: 'enum',
-    enum: ActivityPiority,
-    nullable: true,
-  })
+  @Column({ type: 'enum', enum: ActivityPiority, nullable: true })
   priority?: ActivityPiority;
 
   @ManyToOne(() => StagesEntity, { nullable: true })
@@ -47,10 +43,23 @@ export class ActivityEntity extends AbstractEntity {
   @Column({ type: 'boolean', default: false })
   mandatory: boolean;
 
-  @Column({
-    type: 'enum',
-    enum: ActivityCategory,
-    nullable: true,
-  })
+  @Column({ type: 'enum', enum: ActivityCategory, nullable: true })
   category?: ActivityCategory;
+
+  // @OneToMany(
+  //   () => ActivityParticipantEntity,
+  //   (participant) => participant.activity,
+  //   { cascade: true },
+  // )
+  // participants: ActivityParticipantEntity[];
+
+  // @OneToMany(() => ActivityFileEntity, (file) => file.activity, {
+  //   cascade: true,
+  // })
+  // files: ActivityFileEntity[];
+
+  // @OneToMany(() => ActivityFeedbackEntity, (feedback) => feedback.activity, {
+  //   cascade: true,
+  // })
+  // feedbacks: ActivityFeedbackEntity[];
 }
