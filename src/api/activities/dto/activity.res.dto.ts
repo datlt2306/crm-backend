@@ -1,6 +1,7 @@
 import {
   ActivityCategory,
   ActivityPiority,
+  ActivityStatus,
   ActivityType,
 } from '@/database/enum/activity.enum';
 import { ApiProperty } from '@nestjs/swagger';
@@ -15,7 +16,7 @@ export class ActivityResDto {
   @Expose()
   name: string;
 
-  @ApiProperty({ enum: ActivityType, example: ActivityType.TASK })
+  @ApiProperty({ enum: ActivityType, example: ActivityType.EVENT })
   @Expose()
   type: ActivityType;
 
@@ -77,4 +78,8 @@ export class ActivityResDto {
   @ApiProperty({ example: '2025-07-20T08:43:00.230Z' })
   @Expose()
   updatedAt: Date;
+
+  @ApiProperty({ enum: ActivityStatus, example: ActivityStatus.NEW })
+  @Expose()
+  status: ActivityStatus;
 }
