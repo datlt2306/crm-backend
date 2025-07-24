@@ -3,7 +3,6 @@ import fs from 'fs';
 import path from 'path';
 
 const secretsDir = path.resolve(process.cwd(), 'secrets');
-if (!fs.existsSync(secretsDir)) fs.mkdirSync(secretsDir);
 
 const privateKeyPath = path.join(secretsDir, 'private.key');
 const publicKeyPath = path.join(secretsDir, 'public.key');
