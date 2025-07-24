@@ -39,7 +39,6 @@ export class UserController {
 
   @ApiAuth({
     summary: 'Get all users',
-    errorResponses: [400, 401, 403, 500],
     description: 'Retrieve a paginated list of all users in the system.',
     paginationType: 'offset',
     isPaginated: true,

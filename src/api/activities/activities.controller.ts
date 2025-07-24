@@ -1,6 +1,6 @@
 import { Uuid } from '@/common/types/common.type';
 import { UserRole } from '@/database/enum/user.enum';
-import { ApiAuth, ApiPublic } from '@/decorators/http.decorators';
+import { ApiAuth } from '@/decorators/http.decorators';
 import { Roles } from '@/decorators/roles.decorator';
 import {
   Body,
@@ -11,13 +11,12 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiParam, ApiTags } from '@nestjs/swagger';
 import { ActivitiesService } from './activities.service';
 import { ActivityResDto } from './dto/activity.res.dto';
 import { CreateActivityDto } from './dto/create-activity.dto';
 import { QueryActivityDto } from './dto/query-activity.dto';
 import { UpdateActivityStatusDto } from './dto/update-activity-status.dto';
-import { UpdateActivityDto } from './dto/update-activity.dto';
 
 @ApiTags('Activities')
 @Controller('activities')
@@ -41,19 +40,16 @@ export class ActivitiesController {
     return this.activitiesService.findAll(query);
   }
 
-  @Patch(':id')
-  @ApiPublic({
-    summary: 'Update',
-    description: 'Cập nhật activity',
-    type: ActivityResDto,
-  })
-  async updateActivity(@Body() dto: UpdateActivityDto) {}
-
   @Patch(':id/status')
   @ApiAuth({
     summary: 'Cập nhật trạng thái công việc',
     description: 'Chỉ giảng viên, trưởng môn, chủ nhiệm bộ môn được phép',
     type: UpdateActivityStatusDto,
+    auths: ['jwt'],
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'ID của activity cần cập nhật trạng thái',
   })
   @Roles(UserRole.CNBM, UserRole.TM, UserRole.GV)
   updateStatus(@Param('id') id: Uuid, @Body() dto: UpdateActivityStatusDto) {

@@ -77,10 +77,13 @@ export class ActivitiesService extends BaseService<ActivityEntity> {
     });
 
     return new OffsetPaginatedDto(
-      plainToInstance(ActivityResDto, activities),
+      plainToInstance(ActivityResDto, activities, {
+        excludeExtraneousValues: true,
+      }),
       metaDto,
     );
   }
+
   async updateStatus(id: Uuid, dto: UpdateActivityStatusDto) {
     const activity = await this.activityRepo.findOneOrFail({ where: { id } });
     activity.status = dto.status;

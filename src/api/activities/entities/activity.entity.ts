@@ -6,7 +6,10 @@ import {
   ActivityStatus,
   ActivityType,
 } from '@/database/enum/activity.enum';
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { ActivityFeedbackEntity } from './activity-feedback.entity';
+import { ActivityFileEntity } from './activity-file.entity';
+import { ActivityParticipantEntity } from './activity-participant.entity';
 
 @Entity('activities')
 export class ActivityEntity extends AbstractEntity {
@@ -49,20 +52,18 @@ export class ActivityEntity extends AbstractEntity {
   @Column({ type: 'enum', enum: ActivityStatus, default: ActivityStatus.NEW })
   status: ActivityStatus;
 
-  // @OneToMany(
-  //   () => ActivityParticipantEntity,
-  //   (participant) => participant.activity,
-  //   { cascade: true },
-  // )
-  // participants: ActivityParticipantEntity[];
+  @OneToMany('ActivityParticipantEntity', 'activity', {
+    cascade: true,
+    lazy: true,
+  })
+  participants: Promise<ActivityParticipantEntity[]>;
 
-  // @OneToMany(() => ActivityFileEntity, (file) => file.activity, {
-  //   cascade: true,
-  // })
-  // files: ActivityFileEntity[];
+  @OneToMany('ActivityFileEntity', 'activity', { cascade: true, lazy: true })
+  files: Promise<ActivityFileEntity[]>;
 
-  // @OneToMany(() => ActivityFeedbackEntity, (feedback) => feedback.activity, {
-  //   cascade: true,
-  // })
-  // feedbacks: ActivityFeedbackEntity[];
+  @OneToMany('ActivityFeedbackEntity', 'activity', {
+    cascade: true,
+    lazy: true,
+  })
+  feedbacks: Promise<ActivityFeedbackEntity[]>;
 }

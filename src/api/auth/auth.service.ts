@@ -21,6 +21,7 @@ export class AuthService {
 
   verifyAccessToken(token: string) {
     try {
+      console.log('Verifying access token:', token);
       const options: JwtVerifyOptions = {
         algorithms: ['RS256'],
       };
