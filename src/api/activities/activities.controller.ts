@@ -5,19 +5,19 @@ import { Roles } from '@/decorators/roles.decorator';
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Param,
   Patch,
   Post,
   Query,
 } from '@nestjs/common';
-import { ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiTags, ApiParam } from '@nestjs/swagger';
 import { ActivitiesService } from './activities.service';
 import { ActivityResDto } from './dto/activity.res.dto';
 import { AttachFileDto } from './dto/attach-file.dto';
 import { CreateActivityDto } from './dto/create-activity.dto';
 import { QueryActivityDto } from './dto/query-activity.dto';
+import { UpdateParticipantReqDto } from './dto/update-participant.req.dto';
 import { UpdateActivityStatusDto } from './dto/update-activity-status.dto';
 import { UpdateActivityDto } from './dto/update-activity.dto';
 
@@ -114,5 +114,15 @@ export class ActivitiesController {
   @ApiParam({ name: 'id', description: 'ID của activity' })
   getFiles(@Param('id') id: Uuid) {
     return this.activitiesService.getFiles(id);
+  }
+
+  @Patch(':id/participants')
+  @ApiAuth({ summary: 'Cập nhật participant', type: UpdateParticipantReqDto })
+  @Roles(UserRole.CNBM, UserRole.TM)
+  updateParticipants(
+    @Param('id') id: Uuid,
+    @Body() dto: UpdateParticipantReqDto,
+  ) {
+    return this.activitiesService.updateParticipants(id, dto);
   }
 }

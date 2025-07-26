@@ -150,7 +150,7 @@ Folder where we keep all our e2e test files.
 
 ## `.env`
 
-Environment variables which will load before app start and will be stored in `process.env`, (*) is a env name (local, development, test, staging, production)
+Environment variables which will load before app start and will be stored in `process.env`, (\*) is a env name (local, development, test, staging, production)
 
 ## `.gitignore`
 
