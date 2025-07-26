@@ -1,10 +1,10 @@
 import { viteBundler } from '@vuepress/bundler-vite';
+import { markdownImagePlugin } from '@vuepress/plugin-markdown-image';
+import { markdownTabPlugin } from '@vuepress/plugin-markdown-tab';
 import { searchPlugin } from '@vuepress/plugin-search';
 import { defaultTheme } from '@vuepress/theme-default';
 import { defineUserConfig } from 'vuepress';
 import { mdEnhancePlugin } from 'vuepress-plugin-md-enhance';
-import { markdownImagePlugin } from '@vuepress/plugin-markdown-image';
-import { markdownTabPlugin } from '@vuepress/plugin-markdown-tab';
 import { en as enThemeConfig } from './config/theme/en.config.mjs';
 import { vi as viThemeConfig } from './config/theme/vi.config.mjs';
 

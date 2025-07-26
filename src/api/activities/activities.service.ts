@@ -1,13 +1,17 @@
 import { OffsetPaginatedDto } from '@/common/dto/offset-pagination/paginated.dto';
+import { Uuid } from '@/common/types/common.type';
+import { ParticipantStatus } from '@/database/enum/activity.enum';
 import { BaseService } from '@/services/base.service';
 import { paginate } from '@/utils/offset-pagination';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
 import { Repository } from 'typeorm';
 import { ActivityResDto } from './dto/activity.res.dto';
 import { CreateActivityDto } from './dto/create-activity.dto';
 import { QueryActivityDto } from './dto/query-activity.dto';
+import { UpdateParticipantReqDto } from './dto/update-participant.req.dto';
+import { ActivityParticipantEntity } from './entities/activity-participant.entity';
 import { ActivityEntity } from './entities/activity.entity';
 
 @Injectable()
@@ -15,6 +19,8 @@ export class ActivitiesService extends BaseService<ActivityEntity> {
   constructor(
     @InjectRepository(ActivityEntity)
     private readonly activityRepo: Repository<ActivityEntity>,
+    @InjectRepository(ActivityParticipantEntity)
+    private readonly participantRepo: Repository<ActivityParticipantEntity>,
   ) {
     super(activityRepo);
   }
@@ -73,5 +79,30 @@ export class ActivitiesService extends BaseService<ActivityEntity> {
       plainToInstance(ActivityResDto, activities),
       metaDto,
     );
+  }
+
+  async updateParticipants(id: Uuid, dto: UpdateParticipantReqDto) {
+    const activity = await this.activityRepo.findOne({
+      where: { id },
+    });
+    if (!activity) {
+      throw new NotFoundException('Activity not found');
+    }
+    let participant = await this.participantRepo.findOne({
+      where: { activityId: id, userId: dto.userId },
+    });
+    if (participant) {
+      participant.role = dto.role;
+      // Nếu muốn cập nhật status, có thể thêm ở đây
+    } else {
+      participant = this.participantRepo.create({
+        activityId: id,
+        userId: dto.userId,
+        role: dto.role,
+        status: ParticipantStatus.ACCEPTED,
+      });
+    }
+    await this.participantRepo.save(participant);
+    return participant;
   }
 }
