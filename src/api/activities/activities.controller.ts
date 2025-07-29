@@ -5,21 +5,22 @@ import { Roles } from '@/decorators/roles.decorator';
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
   Post,
   Query,
 } from '@nestjs/common';
-import { ApiTags, ApiParam } from '@nestjs/swagger';
+import { ApiParam, ApiTags } from '@nestjs/swagger';
 import { ActivitiesService } from './activities.service';
 import { ActivityResDto } from './dto/activity.res.dto';
 import { AttachFileDto } from './dto/attach-file.dto';
 import { CreateActivityDto } from './dto/create-activity.dto';
 import { QueryActivityDto } from './dto/query-activity.dto';
-import { UpdateParticipantReqDto } from './dto/update-participant.req.dto';
 import { UpdateActivityStatusDto } from './dto/update-activity-status.dto';
 import { UpdateActivityDto } from './dto/update-activity.dto';
+import { UpdateParticipantReqDto } from './dto/update-participant.req.dto';
 
 @ApiTags('Activities')
 @Controller('activities')
@@ -102,8 +103,6 @@ export class ActivitiesController {
   @ApiAuth({ summary: 'Đính kèm file cho activity' })
   @ApiParam({ name: 'id', description: 'ID của activity' })
   async attachFile(@Param('id') id: Uuid, @Body() dto: AttachFileDto) {
-    console.log('Attaching file to activity:', id, dto);
-
     return this.activitiesService.attachFile(id, dto);
   }
 
@@ -118,6 +117,10 @@ export class ActivitiesController {
 
   @Patch(':id/participants')
   @ApiAuth({ summary: 'Cập nhật participant', type: UpdateParticipantReqDto })
+  @ApiParam({
+    name: 'id',
+    description: 'ID của activity để cập nhật participants',
+  })
   @Roles(UserRole.CNBM, UserRole.TM)
   updateParticipants(
     @Param('id') id: Uuid,
