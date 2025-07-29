@@ -35,8 +35,12 @@ async function bootstrap() {
 
   app.useLogger(app.get(Logger));
 
-  // Setup security headers
-  app.use(helmet());
+  // Setup security headers with cross-domain considerations
+  app.use(
+    helmet({
+      crossOriginResourcePolicy: { policy: 'cross-origin' },
+    }),
+  );
 
   // For high-traffic websites in production, it is strongly recommended to offload compression from the application server - typically in a reverse proxy (e.g., Nginx). In that case, you should not use compression middleware.
   app.use(compression());
@@ -50,17 +54,73 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService<AllConfigType>);
   const reflector = app.get(Reflector);
+
+  const isProduction =
+    configService.getOrThrow('app.nodeEnv', {
+      infer: true,
+    }) === 'production';
   const corsOrigin = configService.getOrThrow('app.corsOrigin', {
     infer: true,
   });
 
-  app.enableCors({
-    origin: corsOrigin,
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    allowedHeaders: 'Content-Type, Accept',
-    credentials: true,
-  });
+  console.info('Environment:', isProduction ? 'production' : 'development');
   console.info('CORS Origin:', corsOrigin);
+
+  // app.enableCors({
+  //   origin: corsOrigin,
+  //   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  //   allowedHeaders: [
+  //     'Content-Type',
+  //     'Authorization',
+  //     'X-Requested-With',
+  //     'Accept',
+  //     'Origin',
+  //     'X-CSRF-Token',
+  //   ],
+  //   credentials: true,
+  //   exposedHeaders: ['Set-Cookie'],
+  // });
+
+  app.enableCors({
+    origin: (origin, callback) => {
+      // Allow request with no origin (e.g., mobile apps, Postman, etc.)
+      if (!origin) return callback(null, true);
+
+      // Handle arrray of origins or single string origin
+      const allowedOrigins = Array.isArray(corsOrigin)
+        ? corsOrigin
+        : [corsOrigin];
+
+      if (allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+        return callback(null, true);
+      } else {
+        console.warn('Blocked origin:', origin);
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'X-Requested-With',
+      'Accept',
+      'Origin',
+      'X-CSRF-Token',
+      'Cache-Control',
+    ],
+    credentials: true, // Critical for cross-domain cookies
+    exposedHeaders: ['Set-Cookie'],
+    optionsSuccessStatus: 200, // IE11 support
+    preflightContinue: false,
+  });
+
+  app.use((req, res, next) => {
+    if (req.method === 'OPTIONS') {
+      res.header('Access-Control-Allow-Methods', 'true');
+    }
+
+    next();
+  });
 
   // Use global prefix if you don't have subdomain
   app.setGlobalPrefix(

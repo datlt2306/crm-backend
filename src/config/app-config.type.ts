@@ -2,6 +2,8 @@ export type AppConfig = {
   nodeEnv: string;
   name: string;
   url: string;
+  frontendUrl: string;
+  frontendDomain: string;
   port: number;
   debug: boolean;
   apiPrefix: string;
