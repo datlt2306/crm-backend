@@ -1,6 +1,6 @@
+import { SemesterStatus } from '@/database/enum/semeter.enum';
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
-import { SemesterStatus } from '@/database/enum/semeter.enum';
 
 export class SemesterBlockResDto {
   @ApiProperty({
@@ -59,10 +59,7 @@ export class SemesterResDto {
   @ApiProperty({
     description: 'Danh sách các block học tập trong học kỳ',
     type: [SemesterBlockResDto],
-    example: [
-      { name: 'Block 1' },
-      { name: 'Block 2' }
-    ],
+    example: [{ name: 'Block 1' }, { name: 'Block 2' }],
   })
   @Expose()
   blocks: SemesterBlockResDto[];
@@ -80,4 +77,4 @@ export class SemesterResDto {
   })
   @Expose()
   updatedAt: Date;
-} 
+}

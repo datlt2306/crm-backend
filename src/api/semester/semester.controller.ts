@@ -1,9 +1,9 @@
 import { PageOptionsDto } from '@/common/dto/offset-pagination/page-options.dto';
+import { ResponseDto } from '@/common/dto/response/response.dto';
 import { Uuid } from '@/common/types/common.type';
+import { UserRole } from '@/database/enum/user.enum';
 import { ApiAuth, ApiPublic } from '@/decorators/http.decorators';
 import { Roles } from '@/decorators/roles.decorator';
-import { UserRole } from '@/database/enum/user.enum';
-import { RolesGuard } from '@/guards/roles.guard';
 import {
   Body,
   Controller,
@@ -14,12 +14,11 @@ import {
   Patch,
   Post,
   Query,
-  UseGuards,
 } from '@nestjs/common';
 import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateSemesterDto } from './dto/create-semester.dto';
-import { UpdateSemesterDto } from './dto/update-semester.dto';
 import { SemesterResDto } from './dto/semester.res.dto';
+import { UpdateSemesterDto } from './dto/update-semester.dto';
 import { SemesterService } from './semester.service';
 
 @ApiTags('Học kỳ')
@@ -31,9 +30,7 @@ export class SemesterController {
   @ApiAuth({
     summary: 'Tạo học kỳ mới',
     description: 'OK',
-    auths: ['jwt'],
-    statusCode: 201,
-    type: CreateSemesterDto,
+    type: ResponseDto<SemesterResDto>,
   })
   @Roles(UserRole.CNBM, UserRole.TM)
   async create(@Body() createSemesterDto: CreateSemesterDto) {
@@ -52,16 +49,16 @@ export class SemesterController {
   }
 
   @Get(':id')
-  @ApiPublic({ 
+  @ApiPublic({
     summary: 'Lấy thông tin học kỳ theo ID',
-    description: 'OK'
+    description: 'OK',
   })
   @ApiResponse({ status: 200, type: SemesterResDto })
-  @ApiParam({ 
-    name: 'id', 
-    type: 'string', 
+  @ApiParam({
+    name: 'id',
+    type: 'string',
     description: 'ID của học kỳ cần lấy thông tin',
-    example: '123e4567-e89b-12d3-a456-426614174000'
+    example: '123e4567-e89b-12d3-a456-426614174000',
   })
   async findOne(@Param('id', ParseUUIDPipe) id: Uuid) {
     return await this.semesterService.findById(id);
@@ -75,13 +72,16 @@ export class SemesterController {
     type: UpdateSemesterDto,
   })
   @Roles(UserRole.CNBM, UserRole.TM)
-  @ApiParam({ 
-    name: 'id', 
-    type: 'string', 
+  @ApiParam({
+    name: 'id',
+    type: 'string',
     description: 'ID của học kỳ cần cập nhật',
-    example: '123e4567-e89b-12d3-a456-426614174000'
+    example: '123e4567-e89b-12d3-a456-426614174000',
   })
-  async update(@Param('id', ParseUUIDPipe) id: Uuid, @Body() updateSemesterDto: UpdateSemesterDto) {
+  async update(
+    @Param('id', ParseUUIDPipe) id: Uuid,
+    @Body() updateSemesterDto: UpdateSemesterDto,
+  ) {
     return await this.semesterService.updateSemester(id, updateSemesterDto);
   }
 
@@ -91,11 +91,11 @@ export class SemesterController {
     description: 'OK',
     statusCode: 204,
   })
-  @ApiParam({ 
-    name: 'id', 
-    type: 'string', 
+  @ApiParam({
+    name: 'id',
+    type: 'string',
     description: 'ID của học kỳ cần xóa',
-    example: '123e4567-e89b-12d3-a456-426614174000'
+    example: '123e4567-e89b-12d3-a456-426614174000',
   })
   async remove(@Param('id', ParseUUIDPipe) id: Uuid) {
     return await this.semesterService.deleteSemester(id);

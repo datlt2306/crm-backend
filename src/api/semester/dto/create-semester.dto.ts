@@ -1,7 +1,14 @@
 import { SemesterStatus } from '@/database/enum/semeter.enum';
-import { IsDate, IsEnum, IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator';
-import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
+import { Expose, Type } from 'class-transformer';
+import {
+  IsDate,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 
 export class BlockDto {
   @ApiProperty({
@@ -11,6 +18,7 @@ export class BlockDto {
   })
   @IsString()
   @IsNotEmpty()
+  @Expose()
   name: string;
 }
 
@@ -22,6 +30,7 @@ export class CreateSemesterDto {
   })
   @IsString()
   @IsNotEmpty()
+  @Expose()
   name: string;
 
   @ApiProperty({
@@ -31,6 +40,7 @@ export class CreateSemesterDto {
   })
   @IsDate()
   @Type(() => Date)
+  @Expose()
   startDate: Date;
 
   @ApiProperty({
@@ -40,6 +50,7 @@ export class CreateSemesterDto {
   })
   @IsDate()
   @Type(() => Date)
+  @Expose()
   endDate: Date;
 
   @ApiProperty({
@@ -49,28 +60,30 @@ export class CreateSemesterDto {
   })
   @IsString()
   @IsOptional()
+  @Expose()
   description?: string;
 
   @ApiProperty({
-    description: 'Trạng thái học kỳ: Ongoing (Đang diễn ra), Completed (Đã hoàn thành), Upcoming (Sắp diễn ra)',
+    description:
+      'Trạng thái học kỳ: Ongoing (Đang diễn ra), Completed (Đã hoàn thành), Upcoming (Sắp diễn ra)',
     enum: SemesterStatus,
     example: SemesterStatus.ONGOING,
     required: true,
   })
   @IsEnum(SemesterStatus)
+  @Expose()
   status: SemesterStatus;
 
   @ApiProperty({
-    description: 'Danh sách các block học tập trong học kỳ (thường có 2 block: Block 1 và Block 2)',
+    description:
+      'Danh sách các block học tập trong học kỳ (thường có 2 block: Block 1 và Block 2)',
     type: [BlockDto],
-    example: [
-      { name: 'Block 1' },
-      { name: 'Block 2' }
-    ],
+    example: [{ name: 'Block 1' }, { name: 'Block 2' }],
     required: false,
   })
   @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => BlockDto)
+  @Expose()
   blocks?: BlockDto[];
 }
