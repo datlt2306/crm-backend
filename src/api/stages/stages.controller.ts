@@ -44,6 +44,11 @@ export class StagesController {
 
   @Get(':id')
   @ApiPublic({ summary: 'Lấy thông tin stage theo id' })
+  @ApiParam({
+    name: 'id',
+    type: 'string',
+    description: 'ID của stage cần lấy thông tin',
+  })
   @ApiResponse({ status: 200, type: StageDto })
   async findOne(@Param('id') id: Uuid) {
     return await this.stagesService.findOne(id);

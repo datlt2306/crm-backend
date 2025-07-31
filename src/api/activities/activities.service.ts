@@ -13,14 +13,17 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
 import { Repository } from 'typeorm';
+import { ActivityFeedbackResDto } from './dto/activity-feedback.res.dto';
 import { ActivityResDto } from './dto/activity.res.dto';
 import { AttachFileDto } from './dto/attach-file.dto';
 import { AttachFileResDto } from './dto/attach-file.res.dto';
+import { CreateActivityFeedbackDto } from './dto/create-activity-feedback.dto';
 import { CreateActivityDto } from './dto/create-activity.dto';
 import { QueryActivityDto } from './dto/query-activity.dto';
 import { UpdateActivityStatusDto } from './dto/update-activity-status.dto';
 import { UpdateActivityDto } from './dto/update-activity.dto';
 import { UpdateParticipantReqDto } from './dto/update-participant.req.dto';
+import { ActivityFeedbackEntity } from './entities/activity-feedback.entity';
 import { ActivityFileEntity } from './entities/activity-file.entity';
 import { ActivityParticipantEntity } from './entities/activity-participant.entity';
 import { ActivityEntity } from './entities/activity.entity';
@@ -34,6 +37,8 @@ export class ActivitiesService extends BaseService<ActivityEntity> {
     private readonly activityFileRepo: Repository<ActivityFileEntity>,
     @InjectRepository(ActivityParticipantEntity)
     private readonly participantRepo: Repository<ActivityParticipantEntity>,
+    @InjectRepository(ActivityFeedbackEntity)
+    private readonly activityFeedbackRepo: Repository<ActivityFeedbackEntity>,
   ) {
     super(activityRepo);
   }
@@ -239,5 +244,42 @@ export class ActivitiesService extends BaseService<ActivityEntity> {
     }
     await this.participantRepo.save(participant);
     return participant;
+  }
+  async getFeedbacksByActivityId(
+    activityId: Uuid,
+  ): Promise<ResponseDto<ActivityFeedbackResDto[]>> {
+    const feedbacks = await this.activityFeedbackRepo.find({
+      where: { activityId },
+      relations: ['user'],
+      order: { submittedAt: 'DESC' },
+    });
+    return new ResponseDto<ActivityFeedbackResDto[]>({
+      data: plainToInstance(ActivityFeedbackResDto, feedbacks, {
+        excludeExtraneousValues: true,
+      }),
+      message: 'Feedbacks retrieved successfully',
+    });
+  }
+  async createFeedback(
+    activityId: Uuid,
+    userId: Uuid,
+    dto: CreateActivityFeedbackDto,
+  ) {
+    // Kiểm tra activity tồn tại
+    await this.activityRepo.findOneOrFail({ where: { id: activityId } });
+
+    const feedback = this.activityFeedbackRepo.create({
+      activityId,
+      userId,
+      content: dto.content,
+    });
+    await this.activityFeedbackRepo.save(feedback);
+
+    return new ResponseDto<ActivityFeedbackResDto>({
+      data: plainToInstance(ActivityFeedbackResDto, feedback, {
+        excludeExtraneousValues: true,
+      }),
+      message: 'Feedbacks retrieved successfully',
+    });
   }
 }
