@@ -8,4 +8,11 @@ export class UpdateStageDto extends PartialType(CreateStageDto) {
     required: false,
   })
   title?: string;
+
+  @ApiProperty({
+    example: 2,
+    description: 'Vị trí mới của stage trong danh sách',
+    required: false,
+  })
+  position?: number;
 }

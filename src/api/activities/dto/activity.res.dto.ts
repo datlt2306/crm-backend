@@ -1,3 +1,4 @@
+import { SemesterResDto } from '@/api/semester/dto/semester.res.dto';
 import {
   ActivityCategory,
   ActivityPiority,
@@ -10,6 +11,7 @@ import { Expose, Type } from 'class-transformer';
 import { ActivityFeedbackResDto } from './activity-feedback.res.dto';
 import { ActivityFileResDto } from './activity-file.res.dto';
 import { ActivityParticipantResDto } from './activity-participant.res.dto';
+import { ActivityAssigneeResDto } from './assign.res.dto';
 
 export class ActivityResDto {
   @ApiProperty({ example: '72e7e64a-b8d7-436c-a2cd-cff34c450fa0' })
@@ -103,4 +105,18 @@ export class ActivityResDto {
   @Expose()
   @Type(() => ActivityFeedbackResDto)
   feedbacks?: ActivityFeedbackResDto[];
+
+  @ApiProperty({ type: () => [ActivityAssigneeResDto], required: false })
+  @Expose()
+  @Type(() => ActivityAssigneeResDto)
+  assignees?: ActivityAssigneeResDto[];
+
+  @ApiProperty({ example: 'semester-uuid', required: false })
+  @Expose()
+  semesterId?: string;
+
+  @ApiProperty({ type: () => SemesterResDto, required: false })
+  @Expose()
+  @Type(() => SemesterResDto)
+  semester?: SemesterResDto;
 }

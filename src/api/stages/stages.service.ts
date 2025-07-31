@@ -17,9 +17,32 @@ export class StagesService {
     private readonly stagesRepository: Repository<StagesEntity>,
   ) {}
 
-  async create(createStageDto: CreateStageDto): Promise<StagesEntity> {
-    const stage = this.stagesRepository.create(createStageDto);
-    return await this.stagesRepository.save(stage);
+  async create(
+    createStageDto: CreateStageDto,
+  ): Promise<ResponseDto<StageResDto>> {
+    let position = createStageDto.position;
+
+    if (position === undefined || position === null) {
+      // Lấy position lớn nhất hiện tại
+      const max = await this.stagesRepository
+        .createQueryBuilder('stage')
+        .select('MAX(stage.position)', 'max')
+        .getRawOne();
+      position = (max?.max ?? 0) + 1;
+    }
+
+    const stage = this.stagesRepository.create({
+      ...createStageDto,
+      position,
+    });
+    await this.stagesRepository.save(stage);
+
+    return new ResponseDto<StageResDto>({
+      data: plainToInstance(StageResDto, stage, {
+        excludeExtraneousValues: true,
+      }),
+      message: 'Stage created successfully',
+    });
   }
 
   async findAll(): Promise<ResponseDto<StageResDto[]>> {
@@ -49,7 +72,57 @@ export class StagesService {
   ): Promise<ResponseDto<StageResDto>> {
     const stageEntity = await this.stagesRepository.findOne({ where: { id } });
     if (!stageEntity) throw new NotFoundException('Stage not found');
-    Object.assign(stageEntity, updateStageDto);
+
+    // Lấy tổng số stage hiện tại
+    const count = await this.stagesRepository.count();
+
+    // Nếu có truyền position và khác vị trí cũ thì cần cập nhật lại thứ tự
+    if (
+      updateStageDto.position !== undefined &&
+      updateStageDto.position !== null &&
+      updateStageDto.position !== stageEntity.position
+    ) {
+      let newPosition = updateStageDto.position;
+
+      // Giới hạn newPosition trong khoảng hợp lệ
+      if (newPosition < 0) newPosition = 0;
+      if (newPosition >= count) newPosition = count - 1;
+
+      const oldPosition = stageEntity.position;
+
+      // Nếu kéo lên (vị trí nhỏ hơn)
+      if (newPosition < oldPosition) {
+        await this.stagesRepository
+          .createQueryBuilder()
+          .update(StagesEntity)
+          .set({ position: () => '"position" + 1' })
+          .where('"position" >= :newPosition AND "position" < :oldPosition', {
+            newPosition,
+            oldPosition,
+          })
+          .execute();
+      }
+      // Nếu kéo xuống (vị trí lớn hơn)
+      else if (newPosition > oldPosition) {
+        await this.stagesRepository
+          .createQueryBuilder()
+          .update(StagesEntity)
+          .set({ position: () => '"position" - 1' })
+          .where('"position" <= :newPosition AND "position" > :oldPosition', {
+            newPosition,
+            oldPosition,
+          })
+          .execute();
+      }
+
+      stageEntity.position = newPosition;
+    }
+
+    // Cập nhật các trường khác
+    Object.assign(stageEntity, updateStageDto, {
+      position: stageEntity.position,
+    });
+
     const savedStage = await this.stagesRepository.save(stageEntity);
 
     return new ResponseDto<StageResDto>({

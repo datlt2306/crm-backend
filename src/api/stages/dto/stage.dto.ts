@@ -7,6 +7,10 @@ export class StageDto {
   @ApiProperty({ example: 'Stage 1', description: 'Tên stage' })
   title: string;
 
+  // position
+  @ApiProperty({ example: 1, description: 'Vị trí của stage trong danh sách' })
+  position: number;
+
   @ApiProperty({ example: '2025-07-20T12:00:00Z', description: 'Ngày tạo' })
   createdAt: Date;
 

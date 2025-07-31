@@ -2,7 +2,10 @@ import { OffsetPaginatedDto } from '@/common/dto/offset-pagination/paginated.dto
 import { ResponseNoDataDto } from '@/common/dto/response/response-no-data.dto';
 import { ResponseDto } from '@/common/dto/response/response.dto';
 import { Uuid } from '@/common/types/common.type';
-import { ParticipantStatus } from '@/database/enum/activity.enum';
+import {
+  AssignmentStatus,
+  ParticipantStatus,
+} from '@/database/enum/activity.enum';
 import { BaseService } from '@/services/base.service';
 import { paginate } from '@/utils/offset-pagination';
 import {
@@ -13,8 +16,11 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
 import { Repository } from 'typeorm';
+import { SemesterEntity } from '../semester/entities/semester.entity';
 import { ActivityFeedbackResDto } from './dto/activity-feedback.res.dto';
 import { ActivityResDto } from './dto/activity.res.dto';
+import { AssignUserToActivityDto } from './dto/assign-user-to-activity.dto';
+import { ActivityAssigneeResDto } from './dto/assign.res.dto';
 import { AttachFileDto } from './dto/attach-file.dto';
 import { AttachFileResDto } from './dto/attach-file.res.dto';
 import { CreateActivityFeedbackDto } from './dto/create-activity-feedback.dto';
@@ -23,6 +29,7 @@ import { QueryActivityDto } from './dto/query-activity.dto';
 import { UpdateActivityStatusDto } from './dto/update-activity-status.dto';
 import { UpdateActivityDto } from './dto/update-activity.dto';
 import { UpdateParticipantReqDto } from './dto/update-participant.req.dto';
+import { ActivityAssigneeEntity } from './entities/activity-assignee.entity';
 import { ActivityFeedbackEntity } from './entities/activity-feedback.entity';
 import { ActivityFileEntity } from './entities/activity-file.entity';
 import { ActivityParticipantEntity } from './entities/activity-participant.entity';
@@ -39,6 +46,10 @@ export class ActivitiesService extends BaseService<ActivityEntity> {
     private readonly participantRepo: Repository<ActivityParticipantEntity>,
     @InjectRepository(ActivityFeedbackEntity)
     private readonly activityFeedbackRepo: Repository<ActivityFeedbackEntity>,
+    @InjectRepository(ActivityAssigneeEntity)
+    private readonly activityAssigneeRepo: Repository<ActivityAssigneeEntity>,
+    @InjectRepository(SemesterEntity)
+    private readonly semesterRepo: Repository<SemesterEntity>,
   ) {
     super(activityRepo);
   }
@@ -283,6 +294,151 @@ export class ActivitiesService extends BaseService<ActivityEntity> {
         excludeExtraneousValues: true,
       }),
       message: 'Feedbacks retrieved successfully',
+    });
+  }
+
+  async assignUserToActivity(
+    id: Uuid,
+    dto: AssignUserToActivityDto,
+  ): Promise<ResponseDto<ActivityAssigneeEntity[]>> {
+    const userIds = Array.isArray(dto.userId) ? dto.userId : [dto.userId];
+    const assignees: ActivityAssigneeEntity[] = [];
+
+    // Kiểm tra activity tồn tại
+    await this.activityRepo.findOneOrFail({ where: { id } });
+
+    for (const userId of userIds) {
+      // Kiểm tra đã assign chưa
+      let assignee = await this.activityAssigneeRepo.findOne({
+        where: { activityId: id, userId },
+      });
+
+      if (assignee) {
+        // Nếu đã có thì update role/note nếu truyền vào
+        if (dto.role) assignee.role = dto.role;
+        if (dto.note) assignee.note = dto.note;
+        assignee.assignedAt = new Date();
+      } else {
+        // Nếu chưa có thì tạo mới
+        assignee = this.activityAssigneeRepo.create({
+          activityId: id,
+          userId,
+          role: dto.role,
+          note: dto.note,
+          assignedAt: new Date(),
+          status: AssignmentStatus.PENDING,
+        });
+      }
+      await this.activityAssigneeRepo.save(assignee);
+      assignees.push(assignee);
+    }
+
+    return new ResponseDto<ActivityAssigneeEntity[]>({
+      data: assignees,
+      message: 'User(s) assigned to activity successfully',
+    });
+  }
+
+  async getAssigneesByActivityId(
+    activityId: Uuid,
+  ): Promise<ResponseDto<ActivityAssigneeResDto[]>> {
+    const assignees = await this.activityAssigneeRepo.find({
+      where: { activityId },
+      relations: ['user'],
+    });
+    return new ResponseDto<ActivityAssigneeResDto[]>({
+      data: plainToInstance(ActivityAssigneeResDto, assignees, {
+        excludeExtraneousValues: true,
+      }),
+      message: 'Assignees retrieved successfully',
+    });
+  }
+
+  async deleteAssignee(
+    activityId: Uuid,
+    userId: Uuid,
+  ): Promise<ResponseNoDataDto> {
+    const assignee = await this.activityAssigneeRepo.findOne({
+      where: { activityId, userId },
+    });
+    if (!assignee) {
+      throw new NotFoundException('Assignee not found');
+    }
+    await this.activityAssigneeRepo.remove(assignee);
+    return new ResponseNoDataDto({
+      message: 'Assignee removed successfully',
+    });
+  }
+
+  async updateAssignee(
+    activityId: Uuid,
+    userId: Uuid,
+    dto: AssignUserToActivityDto,
+  ): Promise<ResponseDto<ActivityAssigneeResDto>> {
+    const assignee = await this.activityAssigneeRepo.findOne({
+      where: { activityId, userId },
+    });
+    if (!assignee) {
+      throw new NotFoundException('Assignee not found');
+    }
+    // Cập nhật thông tin người thực hiện
+    assignee.role = dto.role;
+    assignee.note = dto.note;
+    await this.activityAssigneeRepo.save(assignee);
+    return new ResponseDto<ActivityAssigneeResDto>({
+      data: plainToInstance(ActivityAssigneeResDto, assignee, {
+        excludeExtraneousValues: true,
+      }),
+      message: 'Assignee updated successfully',
+    });
+  }
+
+  async linkActivityToSemester(
+    activityId: Uuid,
+    semesterId: Uuid,
+  ): Promise<ResponseDto<ActivityResDto>> {
+    // Kiểm tra activity tồn tại
+    const activity = await this.activityRepo.findOneOrFail({
+      where: { id: activityId },
+    });
+
+    // Kiểm tra semester tồn tại
+    const semester = await this.semesterRepo.findOneOrFail({
+      where: { id: semesterId },
+    });
+
+    // Gán activity vào kỳ học
+    activity.semester = semester;
+    await this.activityRepo.save(activity);
+
+    return new ResponseDto<ActivityResDto>({
+      data: plainToInstance(ActivityResDto, activity, {
+        excludeExtraneousValues: true,
+      }),
+      message: 'Activity linked to semester successfully',
+    });
+  }
+
+  async unlinkActivityFromSemester(
+    activityId: Uuid,
+    semesterId: Uuid,
+  ): Promise<ResponseNoDataDto> {
+    // Kiểm tra activity tồn tại
+    const activity = await this.activityRepo.findOneOrFail({
+      where: { id: activityId },
+      relations: ['semester'],
+    });
+
+    if (!activity.semester || activity.semester.id !== semesterId) {
+      throw new NotFoundException('Activity is not linked to this semester');
+    }
+
+    // Xóa liên kết với kỳ học
+    activity.semester = null;
+    await this.activityRepo.save(activity);
+
+    return new ResponseNoDataDto({
+      message: 'Activity unlinked from semester successfully',
     });
   }
 }

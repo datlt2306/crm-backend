@@ -28,8 +28,7 @@ export class StagesController {
     type: StageDto,
   })
   async create(@Body() createStageDto: CreateStageDto) {
-    const stage = await this.stagesService.create(createStageDto);
-    return stage.toDto(StageDto);
+    return this.stagesService.create(createStageDto);
   }
 
   @Get()
@@ -70,7 +69,7 @@ export class StagesController {
   @Delete(':id')
   @ApiAuth({
     summary: 'Xóa stage',
-    statusCode: 204,
+    type: StageDto,
   })
   @ApiParam({
     name: 'id',

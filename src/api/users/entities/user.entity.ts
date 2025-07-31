@@ -1,6 +1,7 @@
+import { ActivityAssigneeEntity } from '@/api/activities/entities/activity-assignee.entity';
 import { AbstractEntity } from '@/database/entities/abstract.entity';
 import { UserRole } from '@/database/enum/user.enum';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
 
 @Entity('users')
 export class UserEntity extends AbstractEntity {
@@ -44,4 +45,9 @@ export class UserEntity extends AbstractEntity {
     nullable: false,
   })
   isActive: boolean;
+
+  @OneToMany('ActivityAssigneeEntity', 'user', {
+    lazy: true,
+  })
+  assignedActivities: Promise<ActivityAssigneeEntity[]>;
 }

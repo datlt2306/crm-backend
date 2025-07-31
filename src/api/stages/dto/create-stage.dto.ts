@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsInt, IsNotEmpty, IsOptional, IsString, Min } from 'class-validator';
 
 export class CreateStageDto {
   @ApiProperty({
@@ -9,4 +9,15 @@ export class CreateStageDto {
   @IsString()
   @IsNotEmpty()
   title: string;
+
+  @ApiProperty({
+    description: 'Vị trí của stage trong danh sách (dùng cho kéo thả Kanban)',
+    example: 1,
+    required: false,
+    default: 0,
+  })
+  @IsInt()
+  @Min(0)
+  @IsOptional()
+  position?: number = 0;
 }

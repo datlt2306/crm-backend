@@ -9,4 +9,8 @@ export class StageResDto {
   @ApiProperty()
   @Expose()
   title: string;
+
+  @ApiProperty({ example: 1, description: 'Vị trí của stage trong danh sách' })
+  @Expose()
+  position: number;
 }

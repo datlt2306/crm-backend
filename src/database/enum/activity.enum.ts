@@ -35,3 +35,15 @@ export enum ActivityStatus {
   COMPLETED = 'COMPLETED',
   OVERDUE = 'OVERDUE',
 }
+
+export enum AssigneeRole {
+  OWNER = 'owner',
+  COLLABORATOR = 'collaborator',
+  REVIEWER = 'reviewer',
+}
+
+export enum AssignmentStatus {
+  PENDING = 'pending',
+  ACCEPTED = 'accepted',
+  DECLINED = 'declined',
+}

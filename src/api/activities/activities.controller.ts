@@ -19,6 +19,8 @@ import { ActivitiesService } from './activities.service';
 import { ActivityFeedbackResDto } from './dto/activity-feedback.res.dto';
 import { ActivityFileResDto } from './dto/activity-file.res.dto';
 import { ActivityResDto } from './dto/activity.res.dto';
+import { AssignUserToActivityDto } from './dto/assign-user-to-activity.dto';
+import { ActivityAssigneeResDto } from './dto/assign.res.dto';
 import { AttachFileDto } from './dto/attach-file.dto';
 import { CreateActivityFeedbackDto } from './dto/create-activity-feedback.dto';
 import { CreateActivityDto } from './dto/create-activity.dto';
@@ -167,5 +169,107 @@ export class ActivitiesController {
     @CurrentUser('id') userId: Uuid,
   ) {
     return this.activitiesService.createFeedback(id, userId, dto);
+  }
+
+  @Patch(':id/assignees')
+  @ApiAuth({
+    summary: 'Gán người thực hiện cho activity',
+    type: AssignUserToActivityDto,
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'ID của activity để gán người thực hiện',
+  })
+  @Roles(UserRole.CNBM, UserRole.TM)
+  async assignUserToActivity(
+    @Param('id') id: Uuid,
+    @Body() dto: AssignUserToActivityDto,
+  ) {
+    return this.activitiesService.assignUserToActivity(id, dto);
+  }
+
+  @Get(':id/assignees')
+  @ApiAuth({
+    summary: 'Lấy danh sách người thực hiện của activity',
+    type: ActivityAssigneeResDto,
+    isArray: true,
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'ID của activity để lấy danh sách người thực hiện',
+  })
+  async getAssigneesByActivityId(@Param('id') id: Uuid) {
+    return this.activitiesService.getAssigneesByActivityId(id);
+  }
+
+  @Delete(':id/assignees/:userId')
+  @ApiParam({
+    name: 'id',
+    description: 'ID của activity',
+  })
+  @ApiParam({
+    name: 'userId',
+    description: 'ID của người dùng cần xóa khỏi activity',
+  })
+  @ApiAuth({
+    summary: 'Xóa người thực hiện khỏi activity',
+    type: ResponseNoDataDto,
+  })
+  async deleteAssignee(@Param('id') id: Uuid, @Param('userId') userId: Uuid) {
+    return this.activitiesService.deleteAssignee(id, userId);
+  }
+
+  @Patch(':id/assignees/:userId')
+  @ApiAuth({
+    summary: 'Cập nhật thông tin người thực hiện trong activity',
+    type: ActivityAssigneeResDto,
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'ID của activity',
+  })
+  @ApiParam({
+    name: 'userId',
+    description: 'ID của người dùng cần cập nhật thông tin',
+  })
+  async updateAssignee(
+    @Param('id') id: Uuid,
+    @Param('userId') userId: Uuid,
+    @Body() dto: AssignUserToActivityDto,
+  ) {
+    return this.activitiesService.updateAssignee(id, userId, dto);
+  }
+
+  @Patch(':id/semester/:semesterId')
+  @ApiAuth({
+    summary: 'Gán activity vào kỳ học',
+    type: ActivityResDto,
+  })
+  @ApiParam({ name: 'id', description: 'ID của activity' })
+  @ApiParam({ name: 'semesterId', description: 'ID của kỳ học' })
+  @Roles(UserRole.CNBM, UserRole.TM)
+  async linkActivityToSemester(
+    @Param('id') id: Uuid,
+    @Param('semesterId') semesterId: Uuid,
+  ) {
+    return this.activitiesService.linkActivityToSemester(id, semesterId);
+  }
+
+  @Delete(':id/semester/:semesterId')
+  @ApiAuth({
+    summary: 'Xóa liên kết activity với kỳ học',
+    type: ResponseNoDataDto,
+  })
+  @ApiParam({ name: 'id', description: 'ID của activity' })
+  @ApiParam({
+    name: 'semesterId',
+    description: 'ID của kỳ học',
+  })
+  @Roles(UserRole.CNBM, UserRole.TM)
+  async unlinkActivityFromSemester(
+    @Param('id') id: Uuid,
+    @Param('semesterId') semesterId: Uuid,
+  ) {
+    return this.activitiesService.unlinkActivityFromSemester(id, semesterId);
   }
 }

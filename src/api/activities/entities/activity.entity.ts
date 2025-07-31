@@ -1,3 +1,4 @@
+import { SemesterEntity } from '@/api/semester/entities/semester.entity';
 import { StagesEntity } from '@/api/stages/entities/stage.entity';
 import { AbstractEntity } from '@/database/entities/abstract.entity';
 import {
@@ -7,6 +8,7 @@ import {
   ActivityType,
 } from '@/database/enum/activity.enum';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { ActivityAssigneeEntity } from './activity-assignee.entity';
 import { ActivityFeedbackEntity } from './activity-feedback.entity';
 import { ActivityFileEntity } from './activity-file.entity';
 import { ActivityParticipantEntity } from './activity-participant.entity';
@@ -52,6 +54,9 @@ export class ActivityEntity extends AbstractEntity {
   @Column({ type: 'enum', enum: ActivityStatus, default: ActivityStatus.NEW })
   status: ActivityStatus;
 
+  @Column({ type: 'uuid', nullable: false })
+  semesterId: string;
+
   @OneToMany('ActivityParticipantEntity', 'activity', {
     cascade: true,
     lazy: true,
@@ -66,4 +71,14 @@ export class ActivityEntity extends AbstractEntity {
     lazy: true,
   })
   feedbacks: Promise<ActivityFeedbackEntity[]>;
+
+  @OneToMany('ActivityAssigneeEntity', 'activity', {
+    lazy: true,
+    cascade: true,
+  })
+  assignees: Promise<ActivityAssigneeEntity[]>;
+
+  @ManyToOne(() => SemesterEntity, { nullable: false, eager: false })
+  @JoinColumn({ name: 'semesterId' })
+  semester: SemesterEntity;
 }

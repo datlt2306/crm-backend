@@ -13,4 +13,7 @@ export class StagesEntity extends AbstractEntity {
     nullable: false,
   })
   title: string;
+
+  @Column({ type: 'int', default: 0 })
+  position: number;
 }
