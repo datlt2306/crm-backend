@@ -1,6 +1,7 @@
 import { ResponseNoDataDto } from '@/common/dto/response/response-no-data.dto';
 import { Uuid } from '@/common/types/common.type';
 import { UserRole } from '@/database/enum/user.enum';
+import { CurrentUser } from '@/decorators/current-user.decorator';
 import { ApiAuth } from '@/decorators/http.decorators';
 import { Roles } from '@/decorators/roles.decorator';
 import {
@@ -15,9 +16,11 @@ import {
 } from '@nestjs/common';
 import { ApiParam, ApiTags } from '@nestjs/swagger';
 import { ActivitiesService } from './activities.service';
+import { ActivityFeedbackResDto } from './dto/activity-feedback.res.dto';
 import { ActivityFileResDto } from './dto/activity-file.res.dto';
 import { ActivityResDto } from './dto/activity.res.dto';
 import { AttachFileDto } from './dto/attach-file.dto';
+import { CreateActivityFeedbackDto } from './dto/create-activity-feedback.dto';
 import { CreateActivityDto } from './dto/create-activity.dto';
 import { QueryActivityDto } from './dto/query-activity.dto';
 import { UpdateActivityStatusDto } from './dto/update-activity-status.dto';
@@ -136,5 +139,33 @@ export class ActivitiesController {
     @Body() dto: UpdateParticipantReqDto,
   ) {
     return this.activitiesService.updateParticipants(id, dto);
+  }
+  @Get(':id/feedback')
+  @ApiAuth({
+    summary: 'Lấy danh sách feedback của activity',
+    type: ActivityFeedbackResDto,
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'ID của activity',
+  })
+  getFeedbacksByActivityId(@Param('id') id: Uuid) {
+    return this.activitiesService.getFeedbacksByActivityId(id);
+  }
+  @Post(':id/feedback')
+  @ApiAuth({
+    summary: 'Gửi phản hồi/feedback cho activity',
+    type: CreateActivityFeedbackDto,
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'ID của activity',
+  })
+  async createFeedback(
+    @Param('id') id: Uuid,
+    @Body() dto: CreateActivityFeedbackDto,
+    @CurrentUser('id') userId: Uuid,
+  ) {
+    return this.activitiesService.createFeedback(id, userId, dto);
   }
 }

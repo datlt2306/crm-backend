@@ -60,6 +60,7 @@ export class StagesService {
     });
   }
 
+  // 97e4a9ed-1007-4744-bda4-bee0c31a0431
   async remove(id: Uuid): Promise<ResponseNoDataDto> {
     const stageEntity = await this.stagesRepository.findOne({ where: { id } });
     if (!stageEntity) throw new NotFoundException('Stage not found');
