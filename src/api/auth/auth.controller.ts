@@ -1,4 +1,8 @@
+import { AuthService } from '@/api/auth/auth.service';
+import { UserResDto } from '@/api/users/dto/user.res.dto';
 import { UserEntity } from '@/api/users/entities/user.entity';
+import { UserService } from '@/api/users/user.service';
+import { ResponseDto } from '@/common/dto/response/response.dto';
 import { AllConfigType } from '@/config/config.type';
 import { ErrorCode } from '@/constants/error-code.constant';
 import { ApiAuth, ApiPublic } from '@/decorators/http.decorators';
@@ -14,9 +18,8 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiTags } from '@nestjs/swagger';
+import { plainToInstance } from 'class-transformer';
 import { CookieOptions, Request, Response } from 'express';
-import { UserService } from '../users/user.service';
-import { AuthService } from './auth.service';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -44,8 +47,6 @@ export class AuthController {
     const isLocalhost =
       origin?.includes('localhost') || origin?.includes('127.0.0.1');
 
-    // Check if frontend and backend share the same domain
-    const backendUrl = this.configService.get('app.url', { infer: true }) || '';
     const isSameDomain =
       origin &&
       frontendUrl &&
@@ -133,6 +134,7 @@ export class AuthController {
   @ApiAuth({
     summary: 'Get current user',
     description: 'Returns the current authenticated user information.',
+    type: UserResDto,
   })
   @Get('me')
   async getMe(@Req() req: Request) {
@@ -149,6 +151,11 @@ export class AuthController {
       throw new UnauthorizedException('User not found');
     }
 
-    return userData;
+    return new ResponseDto<UserResDto>({
+      data: plainToInstance(UserResDto, userData, {
+        excludeExtraneousValues: true,
+      }),
+      message: 'User retrieved successfully',
+    });
   }
 }

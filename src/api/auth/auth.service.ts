@@ -1,6 +1,8 @@
 import { UserEntity } from '@/api/users/entities/user.entity';
+import { ResponseDto } from '@/common/dto/response/response.dto';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService, JwtSignOptions, JwtVerifyOptions } from '@nestjs/jwt';
+import { UserResDto } from '../users/dto/user.res.dto';
 
 @Injectable()
 export class AuthService {
@@ -39,5 +41,10 @@ export class AuthService {
       }
       throw new UnauthorizedException('Access token verification failed');
     }
+  }
+
+  getMe(): Promise<ResponseDto<UserResDto>> {
+    // This method should be implemented to return the current user's information
+    throw new Error('Method not implemented.');
   }
 }

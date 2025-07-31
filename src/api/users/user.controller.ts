@@ -13,11 +13,14 @@ import {
   ParseUUIDPipe,
   Post,
   Query,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiParam, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from './dto/create-user.dto';
-import { QueryUserDto } from './dto/query-user.tdo';
+import { UserResDto } from './dto/user.res.dto';
 import { UserService } from './user.service';
 
 @ApiTags('users')
@@ -38,15 +41,25 @@ export class UserController {
   @ApiAuth({
     summary: 'Get all users',
     description: 'Retrieve a paginated list of all users in the system.',
-    paginationType: 'offset',
     isPaginated: true,
-    type: QueryUserDto,
+    type: UserResDto,
   })
   @Roles(UserRole.TM, UserRole.CNBM)
   @UseGuards(RolesGuard)
   @Get('all')
   findAll(@Query() query: PageOptionsDto) {
     return this.userService.findAll(query);
+  }
+
+  @Post('import')
+  @Roles(UserRole.CNBM, UserRole.TM)
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiAuth({
+    summary: 'Import users from file',
+    description: 'Upload a file to import users in bulk.',
+  })
+  importUsers(@UploadedFile() file: Express.Multer.File) {
+    return this.userService.importUsers(file);
   }
 
   @Delete(':id')

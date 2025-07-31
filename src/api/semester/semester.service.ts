@@ -1,5 +1,5 @@
-import { OffsetPaginatedDto } from '@/common/dto/offset-pagination/paginated.dto';
 import { PageOptionsDto } from '@/common/dto/offset-pagination/page-options.dto';
+import { OffsetPaginatedDto } from '@/common/dto/offset-pagination/paginated.dto';
 import { ResponseNoDataDto } from '@/common/dto/response/response-no-data.dto';
 import { ResponseDto } from '@/common/dto/response/response.dto';
 import { Uuid } from '@/common/types/common.type';
@@ -15,8 +15,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
 import { Repository } from 'typeorm';
 import { CreateSemesterDto } from './dto/create-semester.dto';
-import { UpdateSemesterDto } from './dto/update-semester.dto';
 import { SemesterResDto } from './dto/semester.res.dto';
+import { UpdateSemesterDto } from './dto/update-semester.dto';
 import { SemesterEntity } from './entities/semester.entity';
 
 @Injectable()
@@ -30,9 +30,7 @@ export class SemesterService extends BaseService<SemesterEntity> {
 
   async create(dto: CreateSemesterDto): Promise<ResponseDto<SemesterResDto>> {
     if (dto.startDate >= dto.endDate) {
-      throw new BadRequestException(
-        'Start date must be before end date',
-      );
+      throw new BadRequestException('Start date must be before end date');
     }
 
     const semester = this.semesterRepo.create(dto);
@@ -46,7 +44,9 @@ export class SemesterService extends BaseService<SemesterEntity> {
     });
   }
 
-  async findAll(query: PageOptionsDto): Promise<OffsetPaginatedDto<SemesterResDto>> {
+  async findAll(
+    query: PageOptionsDto,
+  ): Promise<OffsetPaginatedDto<SemesterResDto>> {
     const qb = this.semesterRepo
       .createQueryBuilder('semester')
       .orderBy('semester.createdAt', 'DESC');
@@ -56,19 +56,20 @@ export class SemesterService extends BaseService<SemesterEntity> {
       takeAll: false,
     });
 
-    return new OffsetPaginatedDto(
-      plainToInstance(SemesterResDto, semesters, {
+    return new OffsetPaginatedDto({
+      data: plainToInstance(SemesterResDto, semesters, {
         excludeExtraneousValues: true,
       }),
-      metaDto,
-    );
+      meta: metaDto,
+      message: 'Semesters retrieved successfully',
+    });
   }
 
   async findById(id: Uuid): Promise<ResponseDto<SemesterResDto>> {
     const semester = await this.semesterRepo.findOneOrFail({
       where: { id },
     });
-    
+
     return new ResponseDto<SemesterResDto>({
       data: plainToInstance(SemesterResDto, semester, {
         excludeExtraneousValues: true,
@@ -79,7 +80,7 @@ export class SemesterService extends BaseService<SemesterEntity> {
 
   async deleteSemester(id: Uuid): Promise<ResponseNoDataDto> {
     await this.semesterRepo.delete(id);
-    
+
     return new ResponseNoDataDto({
       message: 'Semester deleted successfully',
     });
@@ -90,16 +91,14 @@ export class SemesterService extends BaseService<SemesterEntity> {
     dto: UpdateSemesterDto,
   ): Promise<ResponseDto<SemesterResDto>> {
     const semester = await this.semesterRepo.findOneOrFail({ where: { id } });
-    
+
     if (dto.startDate && dto.endDate && dto.startDate >= dto.endDate) {
-      throw new BadRequestException(
-        'Start date must be before end date',
-      );
+      throw new BadRequestException('Start date must be before end date');
     }
 
     Object.assign(semester, dto);
     await this.semesterRepo.save(semester);
-    
+
     return new ResponseDto<SemesterResDto>({
       data: plainToInstance(SemesterResDto, semester, {
         excludeExtraneousValues: true,

@@ -1,3 +1,4 @@
+import { ResponseNoDataDto } from '@/common/dto/response/response-no-data.dto';
 import { Uuid } from '@/common/types/common.type';
 import { UserRole } from '@/database/enum/user.enum';
 import { ApiAuth } from '@/decorators/http.decorators';
@@ -14,6 +15,7 @@ import {
 } from '@nestjs/common';
 import { ApiParam, ApiTags } from '@nestjs/swagger';
 import { ActivitiesService } from './activities.service';
+import { ActivityFileResDto } from './dto/activity-file.res.dto';
 import { ActivityResDto } from './dto/activity.res.dto';
 import { AttachFileDto } from './dto/attach-file.dto';
 import { CreateActivityDto } from './dto/create-activity.dto';
@@ -28,7 +30,7 @@ export class ActivitiesController {
   constructor(private readonly activitiesService: ActivitiesService) {}
 
   @Post()
-  @ApiAuth({ summary: 'Tạo mới activity', type: CreateActivityDto })
+  @ApiAuth({ summary: 'Tạo mới activity', type: ActivityResDto })
   @Roles(UserRole.CNBM, UserRole.TM)
   createActivity(@Body() dto: CreateActivityDto) {
     return this.activitiesService.create(dto);
@@ -48,7 +50,7 @@ export class ActivitiesController {
   @ApiAuth({
     summary: 'Cập nhật trạng thái công việc',
     description: 'Chỉ giảng viên, trưởng môn, chủ nhiệm bộ môn được phép',
-    type: UpdateActivityStatusDto,
+    type: ActivityResDto,
   })
   @ApiParam({
     name: 'id',
@@ -76,6 +78,7 @@ export class ActivitiesController {
   @ApiAuth({
     summary: 'Xóa activity theo ID',
     description: 'Chỉ giảng viên, trưởng môn, chủ nhiệm bộ môn được phép',
+    type: ResponseNoDataDto,
   })
   @ApiParam({
     name: 'id',
@@ -89,6 +92,7 @@ export class ActivitiesController {
   @ApiAuth({
     summary: 'Cập nhật activity theo ID',
     description: 'Chỉ giảng viên, trưởng môn, chủ nhiệm bộ môn được phép',
+    type: ActivityResDto,
   })
   @ApiParam({
     name: 'id',
@@ -100,7 +104,10 @@ export class ActivitiesController {
   }
 
   @Post(':id/files')
-  @ApiAuth({ summary: 'Đính kèm file cho activity' })
+  @ApiAuth({
+    summary: 'Đính kèm file cho activity',
+    type: ActivityFileResDto,
+  })
   @ApiParam({ name: 'id', description: 'ID của activity' })
   async attachFile(@Param('id') id: Uuid, @Body() dto: AttachFileDto) {
     return this.activitiesService.attachFile(id, dto);
@@ -109,6 +116,8 @@ export class ActivitiesController {
   @Get(':id/files')
   @ApiAuth({
     summary: 'Lấy danh sách file đính kèm của activity',
+    type: ActivityFileResDto,
+    isArray: true,
   })
   @ApiParam({ name: 'id', description: 'ID của activity' })
   getFiles(@Param('id') id: Uuid) {

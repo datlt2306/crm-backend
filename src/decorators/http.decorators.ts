@@ -8,7 +8,6 @@ import {
 import {
   ApiBasicAuth,
   ApiBearerAuth,
-  ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
   ApiResponse,
@@ -16,7 +15,7 @@ import {
 } from '@nestjs/swagger';
 import { STATUS_CODES } from 'http';
 import { Public } from './public.decorator';
-import { ApiPaginatedResponse } from './swagger.decorators';
+import { ApiCustomResponse, ApiPaginatedResponse } from './swagger.decorators';
 
 type ApiResponseType = number;
 type ApiAuthType = 'basic' | 'api-key' | 'jwt';
@@ -24,6 +23,7 @@ type PaginationType = 'offset' | 'cursor';
 
 interface IApiOptions<T extends Type<any>> {
   type?: T;
+  isArray?: boolean;
   summary?: string;
   description?: string;
   errorResponses?: ApiResponseType[];
@@ -52,6 +52,7 @@ export const ApiPublic = (options: IApiPublicOptions = {}): MethodDecorator => {
     type: options.type,
     description: options?.description ?? 'OK',
     paginationType: options.paginationType || 'offset',
+    isArray: options.isArray || false,
   };
 
   const errorResponses = (options.errorResponses || defaultErrorResponses)?.map(
@@ -67,7 +68,11 @@ export const ApiPublic = (options: IApiPublicOptions = {}): MethodDecorator => {
     Public(),
     ApiOperation({ summary: options?.summary }),
     HttpCode(options.statusCode || defaultStatusCode),
-    isPaginated ? ApiPaginatedResponse(ok) : ApiOkResponse(ok),
+    isPaginated
+      ? ApiPaginatedResponse(ok)
+      : options.type
+        ? ApiCustomResponse(ok)
+        : ApiOkResponse(ok),
     ...errorResponses,
   );
 };
@@ -87,6 +92,7 @@ export const ApiAuth = (options: IApiAuthOptions = {}): MethodDecorator => {
     type: options.type,
     description: options?.description ?? 'OK',
     paginationType: options.paginationType || 'offset',
+    isArray: options.isArray || false,
   };
   const auths = options.auths || ['jwt'];
 
@@ -115,8 +121,8 @@ export const ApiAuth = (options: IApiAuthOptions = {}): MethodDecorator => {
     HttpCode(options.statusCode || defaultStatusCode),
     isPaginated
       ? ApiPaginatedResponse(ok)
-      : options.statusCode === 201
-        ? ApiCreatedResponse(ok)
+      : options.type
+        ? ApiCustomResponse(ok)
         : ApiOkResponse(ok),
     ...authDecorators,
     ...errorResponses,

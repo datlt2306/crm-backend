@@ -11,8 +11,32 @@ export class CursorPaginatedDto<TData> {
   @Expose()
   pagination: CursorPaginationDto;
 
-  constructor(data: TData[], meta: CursorPaginationDto) {
+  @ApiProperty()
+  @Expose()
+  statusCode: number;
+
+  @ApiProperty()
+  @Expose()
+  message: string;
+
+  @ApiProperty()
+  @Expose()
+  timestamp: Date;
+
+  constructor({
+    data,
+    meta,
+    statusCode = 200,
+    message = 'OK',
+  }: {
+    data: TData[];
+    meta: CursorPaginationDto;
+    statusCode?: number;
+    message?: string;
+  }) {
     this.data = data;
     this.pagination = meta;
+    this.statusCode = statusCode;
+    this.message = message;
   }
 }

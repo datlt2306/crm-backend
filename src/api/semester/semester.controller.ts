@@ -1,5 +1,4 @@
 import { PageOptionsDto } from '@/common/dto/offset-pagination/page-options.dto';
-import { ResponseDto } from '@/common/dto/response/response.dto';
 import { Uuid } from '@/common/types/common.type';
 import { UserRole } from '@/database/enum/user.enum';
 import { ApiAuth, ApiPublic } from '@/decorators/http.decorators';
@@ -30,7 +29,7 @@ export class SemesterController {
   @ApiAuth({
     summary: 'Tạo học kỳ mới',
     description: 'OK',
-    type: ResponseDto<SemesterResDto>,
+    type: SemesterResDto,
   })
   @Roles(UserRole.CNBM, UserRole.TM)
   async create(@Body() createSemesterDto: CreateSemesterDto) {
@@ -43,6 +42,7 @@ export class SemesterController {
     description: 'OK',
     statusCode: 200,
     type: SemesterResDto,
+    isPaginated: true,
   })
   async findAll(@Query() query: PageOptionsDto) {
     return await this.semesterService.findAll(query);

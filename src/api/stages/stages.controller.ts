@@ -9,7 +9,7 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
-import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiParam, ApiTags } from '@nestjs/swagger';
 import { CreateStageDto } from './dto/create-stage.dto';
 import { StageDto } from './dto/stage.dto';
 import { UpdateStageDto } from './dto/update-stage.dto';
@@ -37,14 +37,17 @@ export class StagesController {
     summary: 'Lấy danh sách tất cả stage',
     statusCode: 200,
     type: StageDto,
+    isArray: true,
   })
   async findAll() {
     return await this.stagesService.findAll();
   }
 
   @Get(':id')
-  @ApiPublic({ summary: 'Lấy thông tin stage theo id' })
-  @ApiResponse({ status: 200, type: StageDto })
+  @ApiPublic({
+    summary: 'Lấy thông tin stage theo id',
+    type: StageDto,
+  })
   async findOne(@Param('id') id: Uuid) {
     return await this.stagesService.findOne(id);
   }

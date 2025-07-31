@@ -46,13 +46,6 @@ export class ActivitiesService extends BaseService<ActivityEntity> {
         );
       }
     }
-    // if (dto.type === 'task') {
-    //   if (dto.startTime || dto.endTime || dto.location) {
-    //     throw new BadRequestException(
-    //       'Task không được truyền startTime, endTime, location',
-    //     );
-    //   }
-    // }
 
     const activity = this.activityRepo.create(dto);
     const res = await this.activityRepo.save(activity);
@@ -115,17 +108,27 @@ export class ActivitiesService extends BaseService<ActivityEntity> {
       takeAll: false,
     });
 
-    return new OffsetPaginatedDto(
-      plainToInstance(ActivityResDto, activities, {
+    return new OffsetPaginatedDto({
+      data: plainToInstance(ActivityResDto, activities, {
         excludeExtraneousValues: true,
       }),
-      metaDto,
-    );
+      meta: metaDto,
+      message: 'Activities retrieved successfully',
+    });
   }
-  async updateStatus(id: Uuid, dto: UpdateActivityStatusDto) {
+  async updateStatus(
+    id: Uuid,
+    dto: UpdateActivityStatusDto,
+  ): Promise<ResponseDto<ActivityResDto>> {
     const activity = await this.activityRepo.findOneOrFail({ where: { id } });
     activity.status = dto.status;
-    return this.activityRepo.save(activity);
+    await this.activityRepo.save(activity);
+    return new ResponseDto<ActivityResDto>({
+      data: plainToInstance(ActivityResDto, activity, {
+        excludeExtraneousValues: true,
+      }),
+      message: 'Activity status updated successfully',
+    });
   }
 
   async findById(id: Uuid): Promise<ResponseDto<ActivityResDto>> {
