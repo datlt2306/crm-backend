@@ -32,6 +32,12 @@ export default tsEslint.config(
           caughtErrorsIgnorePattern: '^_',
         },
       ],
+      'prettier/prettier': [
+        'error',
+        {
+          endOfLine: 'auto',
+        },
+      ],
     },
   },
 );

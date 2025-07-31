@@ -1,0 +1,4 @@
+#!/bin/sh
+# pre-push hook - skip all tests
+
+exit 0

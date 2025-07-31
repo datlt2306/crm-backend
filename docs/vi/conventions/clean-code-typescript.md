@@ -6,27 +6,27 @@ Các khái niệm về Clean Code dành cho TypeScript.
 
 ## Mục lục
 
-  1. [Giới thiệu](#giới-thiệu)
-  2. [Biến](#biến)
-  3. [Hàm](#functions-hàm)
-  4. [Đối tượng và cấu trúc dữ liệu](#đối-tượng-và-cấu-trúc-dữ-liệu)
-  5. [Lớp](#lớp)
-  6. [SOLID](#solid)
-  7. [Kiểm thử](#kiểm-thử)
-  8. [Xử lý bất động bộ](#xử-lý-bất-động-bộ)
-  9. [Xử lý lỗi](#xử-lý-lỗi)
-  10. [Định dạng](#định-dạng)
-  11. [Chú thích](#chú-thích)
-  12. [Các ngôn ngữ khác](#các-ngôn-ngữ-khác)
+1. [Giới thiệu](#giới-thiệu)
+2. [Biến](#biến)
+3. [Hàm](#functions-hàm)
+4. [Đối tượng và cấu trúc dữ liệu](#đối-tượng-và-cấu-trúc-dữ-liệu)
+5. [Lớp](#lớp)
+6. [SOLID](#solid)
+7. [Kiểm thử](#kiểm-thử)
+8. [Xử lý bất động bộ](#xử-lý-bất-động-bộ)
+9. [Xử lý lỗi](#xử-lý-lỗi)
+10. [Định dạng](#định-dạng)
+11. [Chú thích](#chú-thích)
+12. [Các ngôn ngữ khác](#các-ngôn-ngữ-khác)
 
 ## Giới thiệu
 
 ![Humorous image of software quality estimation as a count of how many expletives
 you shout when reading code](https://www.osnews.com/images/comics/wtfm.jpg)
 
-Trong cuốn sách [*Clean Code*](https://www.amazon.com/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882) của tác giả Robert C. Martin, liệt kê các nguyên tắc thiết kế phần mềm, các nguyên tắc đó cũng được dành cho TypeScript. Nó không phải là một phong cách của một người hay nhóm người. Nó là một hướng dẫn để tạo ra các đoạn code có tính [readable, reusable, and refactorable](https://github.com/ryanmcdermott/3rs-of-software-architecture) khi viết phần mềm có sử dụng TypeScript.
+Trong cuốn sách [_Clean Code_](https://www.amazon.com/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882) của tác giả Robert C. Martin, liệt kê các nguyên tắc thiết kế phần mềm, các nguyên tắc đó cũng được dành cho TypeScript. Nó không phải là một phong cách của một người hay nhóm người. Nó là một hướng dẫn để tạo ra các đoạn code có tính [readable, reusable, and refactorable](https://github.com/ryanmcdermott/3rs-of-software-architecture) khi viết phần mềm có sử dụng TypeScript.
 
-Không phải mọi nguyên tắc được nhắc tới trong tài liệu này đều phải được tuân thủ nghiêm ngặt, thậm chí số nguyên tắc được thống nhất chung có thể sẽ ít hơn trong tài liệu. Đây chỉ là những hướng dẫn và chỉ là những hướng dẫn, nhưng nó là những thức được đúc kết qua nhiều năm của nhóm tác giả *Clean Code*.
+Không phải mọi nguyên tắc được nhắc tới trong tài liệu này đều phải được tuân thủ nghiêm ngặt, thậm chí số nguyên tắc được thống nhất chung có thể sẽ ít hơn trong tài liệu. Đây chỉ là những hướng dẫn và chỉ là những hướng dẫn, nhưng nó là những thức được đúc kết qua nhiều năm của nhóm tác giả _Clean Code_.
 
 Nghề kỹ sư phần mềm của chúng ta mới chỉ có tuổi đời hơn 50 một chút, và chúng ta vẫn đang học hỏi rất nhiều. Khi mà kiến trúc phần mềm cũng tồn tại đủ lâu như ngành kiến trúc, có lẽ chúng ta sẽ có những quy tắc khó hơn bắt buộc phải tuân theo. Hiện tại, những hướng dẫn này đóng vai trò như nền tảng để bạn hoặc nhóm phát triển của bạn có thể đánh giá được chất lượng code khi code TypeScript.
 
@@ -46,7 +46,6 @@ Sử dụng tên biến phân biệt, giúp cho người đọc có thể hiểu
 function between<T>(a1: T, a2: T, a3: T): boolean {
   return a2 <= a1 && a1 <= a3;
 }
-
 ```
 
 **Tốt:**
@@ -70,7 +69,7 @@ type DtaRcrd102 = {
   genymdhms: Date;
   modymdhms: Date;
   pszqint: number;
-}
+};
 ```
 
 **Tốt:**
@@ -80,7 +79,7 @@ type Customer = {
   generationTimestamp: Date;
   modificationTimestamp: Date;
   recordId: number;
-}
+};
 ```
 
 **[⬆ Trở lại đầu trang](#mục-lục)**
@@ -105,7 +104,7 @@ function getUser(): User;
 
 ### Sử dụng tên biến có thể tìm kiếm
 
-Sự thật là chúng ta đọc code nhiều hơn việc chúng ta viết. Vì vậy việc viết code có thể đọc và tìm kiếm là vô cùng quan trọng. Sử dụng các giá trị *không được đặt tên* sẽ làm chương trình của chúng ta trở nên khó hiểu và nó sẽ làm *tổn thương* người đọc. Hãy sử dụng các tên biến có thể tìm kiếm. Một số công cụ như [TSLint](https://palantir.github.io/tslint/rules/no-magic-numbers/) có thể giúp chúng ta tìm ra những hằng số chưa được đặt tên.
+Sự thật là chúng ta đọc code nhiều hơn việc chúng ta viết. Vì vậy việc viết code có thể đọc và tìm kiếm là vô cùng quan trọng. Sử dụng các giá trị _không được đặt tên_ sẽ làm chương trình của chúng ta trở nên khó hiểu và nó sẽ làm _tổn thương_ người đọc. Hãy sử dụng các tên biến có thể tìm kiếm. Một số công cụ như [TSLint](https://palantir.github.io/tslint/rules/no-magic-numbers/) có thể giúp chúng ta tìm ra những hằng số chưa được đặt tên.
 
 **Chưa tốt:**
 
@@ -153,7 +152,7 @@ for (const [id, user] of users) {
 
 Biểu thị rõ ràng sẽ tốt hơn việc hàm ý
 
-*Rõ ràng là Vua.*
+_Rõ ràng là Vua._
 
 **Chưa tốt:**
 
@@ -184,7 +183,7 @@ type Car = {
   carMake: string;
   carModel: string;
   carColor: string;
-}
+};
 
 function print(car: Car): void {
   console.log(`${car.carMake} ${car.carModel} (${car.carColor})`);
@@ -198,7 +197,7 @@ type Car = {
   make: string;
   model: string;
   color: string;
-}
+};
 
 function print(car: Car): void {
   console.log(`${car.make} ${car.model} (${car.color})`);
@@ -242,7 +241,7 @@ const GENRE = {
   DRAMA: 'drama',
   COMEDY: 'comedy',
   DOCUMENTARY: 'documentary',
-}
+};
 
 projector.configureFilm(GENRE.COMEDY);
 
@@ -251,7 +250,7 @@ class Projector {
   configureFilm(genre) {
     switch (genre) {
       case GENRE.ROMANTIC:
-        // some logic to be executed
+      // some logic to be executed
     }
   }
 }
@@ -274,7 +273,7 @@ class Projector {
   configureFilm(genre) {
     switch (genre) {
       case GENRE.ROMANTIC:
-        // some logic to be executed
+      // some logic to be executed
     }
   }
 }
@@ -318,7 +317,7 @@ createMenu('Foo', 'Bar', 'Baz', true);
 **Tốt:**
 
 ```ts
-function createMenu(options: { title: string, body: string, buttonText: string, cancellable: boolean }) {
+function createMenu(options: { title: string; body: string; buttonText: string; cancellable: boolean }) {
   // ...
 }
 
@@ -326,15 +325,14 @@ createMenu({
   title: 'Foo',
   body: 'Bar',
   buttonText: 'Baz',
-  cancellable: true
+  cancellable: true,
 });
 ```
 
 Bạn có thể cải thiện độ dễ đọc của code hơn nữa bằng cách sử dụng [type aliases](https://www.typescriptlang.org/docs/handbook/advanced-types.html#type-aliases):
 
 ```ts
-
-type MenuOptions = { title: string, body: string, buttonText: string, cancellable: boolean };
+type MenuOptions = { title: string; body: string; buttonText: string; cancellable: boolean };
 
 function createMenu(options: MenuOptions) {
   // ...
@@ -344,7 +342,7 @@ createMenu({
   title: 'Foo',
   body: 'Bar',
   buttonText: 'Baz',
-  cancellable: true
+  cancellable: true,
 });
 ```
 
@@ -418,7 +416,9 @@ Khi hàm của bạn có nhiều hơn một mức độ trừu tượng, nó th�
 
 ```ts
 function parseCode(code: string) {
-  const REGEXES = [ /* ... */ ];
+  const REGEXES = [
+    /* ... */
+  ];
   const statements = code.split(' ');
   const tokens = [];
 
@@ -442,7 +442,9 @@ function parseCode(code: string) {
 **Tốt:**
 
 ```ts
-const REGEXES = [ /* ... */ ];
+const REGEXES = [
+  /* ... */
+];
 
 function parseCode(code: string) {
   const tokens = tokenize(code);
@@ -459,7 +461,7 @@ function tokenize(code: string): Token[] {
 
   REGEXES.forEach((regex) => {
     statements.forEach((statement) => {
-      tokens.push( /* ... */ );
+      tokens.push(/* ... */);
     });
   });
 
@@ -469,7 +471,7 @@ function tokenize(code: string): Token[] {
 function parse(tokens: Token[]): SyntaxTree {
   const syntaxTree: SyntaxTree[] = [];
   tokens.forEach((token) => {
-    syntaxTree.push( /* ... */ );
+    syntaxTree.push(/* ... */);
   });
 
   return syntaxTree;
@@ -502,7 +504,7 @@ function showDeveloperList(developers: Developer[]) {
     const data = {
       expectedSalary,
       experience,
-      githubLink
+      githubLink,
     };
 
     render(data);
@@ -518,7 +520,7 @@ function showManagerList(managers: Manager[]) {
     const data = {
       expectedSalary,
       experience,
-      portfolio
+      portfolio,
     };
 
     render(data);
@@ -534,7 +536,7 @@ class Developer {
   getExtraDetails() {
     return {
       githubLink: this.githubLink,
-    }
+    };
   }
 }
 
@@ -543,7 +545,7 @@ class Manager {
   getExtraDetails() {
     return {
       portfolio: this.portfolio,
-    }
+    };
   }
 }
 
@@ -573,7 +575,7 @@ Bạn nên đặc biệt chú trọng tới việc lặp code. Đôi khi, có s�
 **Chưa tốt:**
 
 ```ts
-type MenuConfig = { title?: string, body?: string, buttonText?: string, cancellable?: boolean };
+type MenuConfig = { title?: string; body?: string; buttonText?: string; cancellable?: boolean };
 
 function createMenu(config: MenuConfig) {
   config.title = config.title || 'Foo';
@@ -590,15 +592,18 @@ createMenu({ body: 'Bar' });
 **Tốt:**
 
 ```ts
-type MenuConfig = { title?: string, body?: string, buttonText?: string, cancellable?: boolean };
+type MenuConfig = { title?: string; body?: string; buttonText?: string; cancellable?: boolean };
 
 function createMenu(config: MenuConfig) {
-  const menuConfig = Object.assign({
-    title: 'Foo',
-    body: 'Bar',
-    buttonText: 'Baz',
-    cancellable: true
-  }, config);
+  const menuConfig = Object.assign(
+    {
+      title: 'Foo',
+      body: 'Bar',
+      buttonText: 'Baz',
+      cancellable: true,
+    },
+    config,
+  );
 
   // ...
 }
@@ -609,7 +614,7 @@ createMenu({ body: 'Bar' });
 Hoặc bạn có thể sử dụng cú pháp `destructuring` với các giá trị mặc định:
 
 ```ts
-type MenuConfig = { title?: string, body?: string, buttonText?: string, cancellable?: boolean };
+type MenuConfig = { title?: string; body?: string; buttonText?: string; cancellable?: boolean };
 
 function createMenu({ title = 'Foo', body = 'Bar', buttonText = 'Baz', cancellable = true }: MenuConfig) {
   // ...
@@ -661,7 +666,7 @@ Một tác dụng phụ có thể là ghi vào một file, thay đổi giá tr�
 
 Bây giờ, đôi khi bạn cần có một "tác dụng phụ" trong một chương trình. Giống như ví dụ ở trên, bạn cần phải ghi dữ liệu vào một tệp. Những gì bạn muốn làm là tập trung vào nơi bạn sẽ làm điều này. Không được có nhiều hàm hay class ghi được vào một file cụ thể. Chỉ có một nơi làm được điều đó. Và chỉ một thôi.
 
-Điểm chính của những nguyên tắc được nêu ở tài liệu này là  để tránh những "cạm bẫy" phổ biến như: Chia sẻ trạng thái của các đối tượng mà không theo cấu trúc nào, sử dụng các kiểu biến có thể thay đổi dữ liệu và có thể ghi vào đó mọi thứ, và không tập trung vào những nơi có thể xảy ra các tác dụng phụ.
+Điểm chính của những nguyên tắc được nêu ở tài liệu này là để tránh những "cạm bẫy" phổ biến như: Chia sẻ trạng thái của các đối tượng mà không theo cấu trúc nào, sử dụng các kiểu biến có thể thay đổi dữ liệu và có thể ghi vào đó mọi thứ, và không tập trung vào những nơi có thể xảy ra các tác dụng phụ.
 
 Nếu bạn tránh được những điều này, bạn sẽ hạnh phúc hơn đa số các lập trình viên khác.
 
@@ -715,7 +720,7 @@ Hai lưu ý được đề cập tới phương pháp này:
 ```ts
 function addItemToCart(cart: CartItem[], item: Item): void {
   cart.push({ item, date: Date.now() });
-};
+}
 ```
 
 **Tốt:**
@@ -723,7 +728,7 @@ function addItemToCart(cart: CartItem[], item: Item): void {
 ```ts
 function addItemToCart(cart: CartItem[], item: Item): CartItem[] {
   return [...cart, { item, date: Date.now() }];
-};
+}
 ```
 
 **[⬆ Trở lại đầu trang](#mục-lục)**
@@ -732,7 +737,7 @@ function addItemToCart(cart: CartItem[], item: Item): CartItem[] {
 
 "Ô nhiễm" toàn cục là một thực tiễn tồi tệ trong Javascript, bởi vì code bạn có thể đụng độ với những thư viện khác và người dùng của bạn sẽ bị bối rối khi họ gặp một lỗi trên sản phẩm.
 
-Hãy nghĩa tới một ví dụ sau: Chuyện gì sẽ xảy ra nếu bạn muốn mở rộng phương thức của đối tượng Array trong Javascript, để có thêm phương thức `diff` - phương thức trả về những phần tử khác nhau của hai mảng? Bạn có thể sẽ viết phương thức mới của bạn thông qua `Array.prototype`, nhưng nó có thể đụng độ tới những thư viện khác - những thư viện cũng đã làm những việc tương tự. Chuyện gì sẽ xảy ra nếu thư việc khác cũng sử dụng  cái tên `diff` để tìm ra sự khác nhau giữa phần tử đầu tiên và cuối cùng của một mảng? Điều này giải thích tại sao sẽ tốt hơn nhiều nếu như sử dụng một class, nó đơn giản là mở rộng của lớp `Array`.
+Hãy nghĩa tới một ví dụ sau: Chuyện gì sẽ xảy ra nếu bạn muốn mở rộng phương thức của đối tượng Array trong Javascript, để có thêm phương thức `diff` - phương thức trả về những phần tử khác nhau của hai mảng? Bạn có thể sẽ viết phương thức mới của bạn thông qua `Array.prototype`, nhưng nó có thể đụng độ tới những thư viện khác - những thư viện cũng đã làm những việc tương tự. Chuyện gì sẽ xảy ra nếu thư việc khác cũng sử dụng cái tên `diff` để tìm ra sự khác nhau giữa phần tử đầu tiên và cuối cùng của một mảng? Điều này giải thích tại sao sẽ tốt hơn nhiều nếu như sử dụng một class, nó đơn giản là mở rộng của lớp `Array`.
 
 **Chưa tốt:**
 
@@ -746,7 +751,7 @@ declare global {
 if (!Array.prototype.diff) {
   Array.prototype.diff = function <T>(other: T[]): T[] {
     const hash = new Set(other);
-    return this.filter(elem => !hash.has(elem));
+    return this.filter((elem) => !hash.has(elem));
   };
 }
 ```
@@ -757,8 +762,8 @@ if (!Array.prototype.diff) {
 class MyArray<T> extends Array<T> {
   diff(other: T[]): T[] {
     const hash = new Set(other);
-    return this.filter(elem => !hash.has(elem));
-  };
+    return this.filter((elem) => !hash.has(elem));
+  }
 }
 ```
 
@@ -774,17 +779,20 @@ class MyArray<T> extends Array<T> {
 const contributions = [
   {
     name: 'Uncle Bobby',
-    linesOfCode: 500
-  }, {
+    linesOfCode: 500,
+  },
+  {
     name: 'Suzie Q',
-    linesOfCode: 1500
-  }, {
+    linesOfCode: 1500,
+  },
+  {
     name: 'Jimmy Gosling',
-    linesOfCode: 150
-  }, {
+    linesOfCode: 150,
+  },
+  {
     name: 'Gracie Hopper',
-    linesOfCode: 1000
-  }
+    linesOfCode: 1000,
+  },
 ];
 
 let totalOutput = 0;
@@ -800,21 +808,23 @@ for (let i = 0; i < contributions.length; i++) {
 const contributions = [
   {
     name: 'Uncle Bobby',
-    linesOfCode: 500
-  }, {
+    linesOfCode: 500,
+  },
+  {
     name: 'Suzie Q',
-    linesOfCode: 1500
-  }, {
+    linesOfCode: 1500,
+  },
+  {
     name: 'Jimmy Gosling',
-    linesOfCode: 150
-  }, {
+    linesOfCode: 150,
+  },
+  {
     name: 'Gracie Hopper',
-    linesOfCode: 1000
-  }
+    linesOfCode: 1000,
+  },
 ];
 
-const totalOutput = contributions
-  .reduce((totalLines, output) => totalLines + output.linesOfCode, 0);
+const totalOutput = contributions.reduce((totalLines, output) => totalLines + output.linesOfCode, 0);
 ```
 
 **[⬆ Trở lại đầu trang](#mục-lục)**
@@ -833,7 +843,7 @@ if (subscription.isTrial || account.balance > 0) {
 
 ```ts
 function canActivateService(subscription: Subscription, account: Account) {
-  return subscription.isTrial || account.balance > 0
+  return subscription.isTrial || account.balance > 0;
 }
 
 if (canActivateService(subscription, account)) {
@@ -1053,7 +1063,7 @@ function fibonacci(n: number): number[] {
 }
 
 function print(n: number) {
-  fibonacci(n).forEach(fib => console.log(fib));
+  fibonacci(n).forEach((fib) => console.log(fib));
 }
 
 // In ra 10 số Fibonacci đầu tiên.
@@ -1102,7 +1112,7 @@ function* fibonacci(): IterableIterator<number> {
 
 itiriri(fibonacci())
   .take(10)
-  .forEach(fib => console.log(fib));
+  .forEach((fib) => console.log(fib));
 ```
 
 **[⬆ Trở lại đầu trang](#mục-lục)**
@@ -1125,7 +1135,7 @@ TypeScript hỗ trợ cú pháp getter/setter. Việc sử dụng getter và set
 type BankAccount = {
   balance: number;
   // ...
-}
+};
 
 const value = 100;
 const account: BankAccount = {
@@ -1173,7 +1183,7 @@ account.balance = 100;
 
 ### Tạo ra những đối tượng có thuộc tính private/protected
 
-TypeScript hỗ trợ các kiểu truy cập tới thuộc tính của lớp: `public` *(mặc định)*, `protected` và `private`.
+TypeScript hỗ trợ các kiểu truy cập tới thuộc tính của lớp: `public` _(mặc định)_, `protected` và `private`.
 
 **Chưa tốt:**
 
@@ -1199,8 +1209,7 @@ class Circle {
 
 ```ts
 class Circle {
-  constructor(private readonly radius: number) {
-  }
+  constructor(private readonly radius: number) {}
 
   perimeter() {
     return 2 * Math.PI * this.radius;
@@ -1216,7 +1225,7 @@ class Circle {
 
 ### Ưu tiên tính bất biến
 
-Hệ thống kiểu dữ liệu của TypeScript cho phép bạn đánh dấu những thuộc tính riêng lẻ của một interface / lớp là *chỉ đọc* (readonly). Điều này cho phép làm việc theo kiểu hướng hàm (những đột biến bất ngờ là không tốt).
+Hệ thống kiểu dữ liệu của TypeScript cho phép bạn đánh dấu những thuộc tính riêng lẻ của một interface / lớp là _chỉ đọc_ (readonly). Điều này cho phép làm việc theo kiểu hướng hàm (những đột biến bất ngờ là không tốt).
 Đối với các kịch bản nâng cao, có một kiểu dữ liệu được tích hợp sẵn `Readonly` trong TypeScript, kiểu dữ liệu này sẽ trả lại kiểu dữ liệu `T` và biến tất cả các thuộc tính của của `T` thành kiểu chỉ đọc bằng cách sử dụng kiểu ánh xạ (xem thêm [mapped types](https://www.typescriptlang.org/docs/handbook/advanced-types.html#mapped-types)).
 
 **Chưa tốt:**
@@ -1244,7 +1253,7 @@ Trường hợp của Array, bạn có thể tạo ra một mảng chỉ đọc 
 **Chưa tốt:**
 
 ```ts
-const array: number[] = [ 1, 3, 5 ];
+const array: number[] = [1, 3, 5];
 array = []; // error
 array.push(100); // array will updated
 ```
@@ -1252,7 +1261,7 @@ array.push(100); // array will updated
 **Tốt:**
 
 ```ts
-const array: ReadonlyArray<number> = [ 1, 3, 5 ];
+const array: ReadonlyArray<number> = [1, 3, 5];
 array = []; // error
 array.push(100); // error
 ```
@@ -1271,11 +1280,11 @@ function hoge(args: readonly string[]) {
 
 ```ts
 const config = {
-  hello: 'world'
+  hello: 'world',
 };
 config.hello = 'world'; // value is changed
 
-const array  = [ 1, 3, 5 ];
+const array = [1, 3, 5];
 array[0] = 10; // value is changed
 
 // writable objects is returned
@@ -1292,12 +1301,12 @@ result.value = 200; // value is changed
 ```ts
 // read-only object
 const config = {
-  hello: 'world'
+  hello: 'world',
 } as const;
 config.hello = 'world'; // error
 
 // read-only array
-const array  = [ 1, 3, 5 ] as const;
+const array = [1, 3, 5] as const;
 array[0] = 10; // error
 
 // You can return read-only objects
@@ -1314,7 +1323,7 @@ result.value = 200; // error
 ### type vs. interface
 
 Sử dụng type khi bạn cần một hoặc kết hợp hoặc sự giao thoa. Sử dụng interface khi bạn muốn `extends` hoặc `implements`. Không có quy tắc nghiêm ngặt nào, tuy nhiên, hãy sử dụng nguyên tắc phù hợp với bạn.
-Để được giải thích chi tiết hơn, hãy tham khảo [câu trả lời này](https://stackoverflow.com/questions/37233735/typescript-interfaces-vs-types/54101543#54101543) về sự khác biệt giữa  `type` và `interface` trong TypeScript.
+Để được giải thích chi tiết hơn, hãy tham khảo [câu trả lời này](https://stackoverflow.com/questions/37233735/typescript-interfaces-vs-types/54101543#54101543) về sự khác biệt giữa `type` và `interface` trong TypeScript.
 
 **Chưa tốt:**
 
@@ -1335,22 +1344,21 @@ interface Config {
 
 type Shape = {
   // ...
-}
+};
 ```
 
 **Tốt:**
 
 ```ts
-
 type EmailConfig = {
   // ...
-}
+};
 
 type DbConfig = {
   // ...
-}
+};
 
-type Config  = EmailConfig | DbConfig;
+type Config = EmailConfig | DbConfig;
 
 // ...
 
@@ -1373,38 +1381,71 @@ class Square implements Shape {
 
 ### Các lớp nên nhỏ gọn
 
-Quy mô của các lớp được đo bằng trách nhiệm của nó. Theo nguyên tắc *Trách nhiệm duy nhất(Single Responsibility principle)* một lớp nên nhỏ gọn.
+Quy mô của các lớp được đo bằng trách nhiệm của nó. Theo nguyên tắc _Trách nhiệm duy nhất(Single Responsibility principle)_ một lớp nên nhỏ gọn.
 
 **Chưa tốt:**
 
 ```ts
 class Dashboard {
-  getLanguage(): string { /* ... */ }
-  setLanguage(language: string): void { /* ... */ }
-  showProgress(): void { /* ... */ }
-  hideProgress(): void { /* ... */ }
-  isDirty(): boolean { /* ... */ }
-  disable(): void { /* ... */ }
-  enable(): void { /* ... */ }
-  addSubscription(subscription: Subscription): void { /* ... */ }
-  removeSubscription(subscription: Subscription): void { /* ... */ }
-  addUser(user: User): void { /* ... */ }
-  removeUser(user: User): void { /* ... */ }
-  goToHomePage(): void { /* ... */ }
-  updateProfile(details: UserDetails): void { /* ... */ }
-  getVersion(): string { /* ... */ }
+  getLanguage(): string {
+    /* ... */
+  }
+  setLanguage(language: string): void {
+    /* ... */
+  }
+  showProgress(): void {
+    /* ... */
+  }
+  hideProgress(): void {
+    /* ... */
+  }
+  isDirty(): boolean {
+    /* ... */
+  }
+  disable(): void {
+    /* ... */
+  }
+  enable(): void {
+    /* ... */
+  }
+  addSubscription(subscription: Subscription): void {
+    /* ... */
+  }
+  removeSubscription(subscription: Subscription): void {
+    /* ... */
+  }
+  addUser(user: User): void {
+    /* ... */
+  }
+  removeUser(user: User): void {
+    /* ... */
+  }
+  goToHomePage(): void {
+    /* ... */
+  }
+  updateProfile(details: UserDetails): void {
+    /* ... */
+  }
+  getVersion(): string {
+    /* ... */
+  }
   // ...
 }
-
 ```
 
 **Tốt:**
 
 ```ts
 class Dashboard {
-  disable(): void { /* ... */ }
-  enable(): void { /* ... */ }
-  getVersion(): string { /* ... */ }
+  disable(): void {
+    /* ... */
+  }
+  enable(): void {
+    /* ... */
+  }
+  getVersion(): string {
+    /* ... */
+  }
 }
 
 // tách các trách nhiệm của lớp bằng cách chuyển những phương thức còn lại sang các lớp khác
@@ -1416,11 +1457,11 @@ class Dashboard {
 ### Sự gắn kết cao và sự móc nối thấp(High cohesion and low coupling)
 
 Sự gắn kết xác định mức độ các thành phần (thuộc tính, phương thức) của lớp có liên quan với nhau. Lý tưởng nhất là, mỗi phương thức của lớp đều sử dụng tất cả các thuộc tính của một lớp.
-Chúng ta gọi lớp đó là *gắn kết tối đa* (maximally cohesive). Trong thực tế, điều này không phải lúc nào cũng có thể đạt được, thậm chí là không nên. Tuy nhiên, bạn nên ưu tiên sự gắn kết cao.
+Chúng ta gọi lớp đó là _gắn kết tối đa_ (maximally cohesive). Trong thực tế, điều này không phải lúc nào cũng có thể đạt được, thậm chí là không nên. Tuy nhiên, bạn nên ưu tiên sự gắn kết cao.
 
 Sự móc nối đề cập tới mức độ liên quan hay phụ thuộc giữa hai lớp với nhau. Các lớp được cho là có sự móc nối thấp nếu sự thay đổi của một trong số chúng không ảnh hưởng tới những lớp khác.
 
-Một thiết kết phần phầm tốt có *Sự gắn kết cao* và *Sự móc nối thấp*.
+Một thiết kết phần phầm tốt có _Sự gắn kết cao_ và _Sự móc nối thấp_.
 
 **Chưa tốt:**
 
@@ -1432,8 +1473,8 @@ class UserManager {
   // tôi bắt buộc vẫn phải truyền vào và khởi một đối tượng `emailSender`.
   constructor(
     private readonly db: Database,
-    private readonly emailSender: EmailSender) {
-  }
+    private readonly emailSender: EmailSender,
+  ) {}
 
   async getUser(id: number): Promise<User> {
     return await db.users.findOne({ id });
@@ -1461,8 +1502,7 @@ class UserManager {
 
 ```ts
 class UserService {
-  constructor(private readonly db: Database) {
-  }
+  constructor(private readonly db: Database) {}
 
   async getUser(id: number): Promise<User> {
     return await this.db.users.findOne({ id });
@@ -1474,8 +1514,7 @@ class UserService {
 }
 
 class UserNotifier {
-  constructor(private readonly emailSender: EmailSender) {
-  }
+  constructor(private readonly emailSender: EmailSender) {}
 
   async sendGreeting(): Promise<void> {
     await this.emailSender.send('Welcome!');
@@ -1495,7 +1534,7 @@ class UserNotifier {
 
 ### Ưu tiên sự cấu thành(composition) hơn thừa kế
 
-Như một phát biểu nổi tiếng của [Design Patterns](https://en.wikipedia.org/wiki/Design_Patterns) bởi Gang of Four, bạn nên *Ưu tiên sự cấu thành hơn thừa kế* khi bạn có thể. Có nhiều lý do để sử dụng tính kế thừa và cũng có nhiều lý do để sử dụng sự cấu thành. Điểm chính của phần mục này là nếu bạn có suy nghĩ sẽ sử dụng sự kế thừa, hãy thử nghĩ xem liệu sử dụng sự cấu thành có thể mô hình hóa vấn đề của bạn tốt hơn hay không. Trong một số trường hợp sử dụng sự cấu thành sẽ tốt hơn dùng sự kế thừa.
+Như một phát biểu nổi tiếng của [Design Patterns](https://en.wikipedia.org/wiki/Design_Patterns) bởi Gang of Four, bạn nên _Ưu tiên sự cấu thành hơn thừa kế_ khi bạn có thể. Có nhiều lý do để sử dụng tính kế thừa và cũng có nhiều lý do để sử dụng sự cấu thành. Điểm chính của phần mục này là nếu bạn có suy nghĩ sẽ sử dụng sự kế thừa, hãy thử nghĩ xem liệu sử dụng sự cấu thành có thể mô hình hóa vấn đề của bạn tốt hơn hay không. Trong một số trường hợp sử dụng sự cấu thành sẽ tốt hơn dùng sự kế thừa.
 
 Sau khi đọc đoạn trên, bạn sẽ nghĩ "khi nào tôi nên sử dụng sự kế thừa?". Nó phụ thuộc vào vấn đề mà bạn đang gặp, nhưng đây là một vài vấn đề, mà ở đó sử dụng kế thừa sẽ tốt hơn là sử dụng sự cấu thành:
 
@@ -1511,8 +1550,8 @@ Sau khi đọc đoạn trên, bạn sẽ nghĩ "khi nào tôi nên sử dụng s
 class Employee {
   constructor(
     private readonly name: string,
-    private readonly email: string) {
-  }
+    private readonly email: string,
+  ) {}
 
   // ...
 }
@@ -1523,7 +1562,8 @@ class EmployeeTaxData extends Employee {
     name: string,
     email: string,
     private readonly ssn: string,
-    private readonly salary: number) {
+    private readonly salary: number,
+  ) {
     super(name, email);
   }
 
@@ -1539,8 +1579,8 @@ class Employee {
 
   constructor(
     private readonly name: string,
-    private readonly email: string) {
-  }
+    private readonly email: string,
+  ) {}
 
   setTaxData(ssn: string, salary: number): Employee {
     this.taxData = new EmployeeTaxData(ssn, salary);
@@ -1553,8 +1593,8 @@ class Employee {
 class EmployeeTaxData {
   constructor(
     public readonly ssn: string,
-    public readonly salary: number) {
-  }
+    public readonly salary: number,
+  ) {}
 
   // ...
 }
@@ -1635,11 +1675,7 @@ class QueryBuilder {
 
 // ...
 
-const query = new QueryBuilder()
-  .from('users')
-  .page(1, 100)
-  .orderBy('firstName', 'lastName')
-  .build();
+const query = new QueryBuilder().from('users').page(1, 100).orderBy('firstName', 'lastName').build();
 ```
 
 **[⬆ Trở lại đầu trang](#mục-lục)**
@@ -1654,8 +1690,7 @@ Như đã nêu trong cuốn Clean Code, "Không nên có nhiều hơn một lý 
 
 ```ts
 class UserSettings {
-  constructor(private readonly user: User) {
-  }
+  constructor(private readonly user: User) {}
 
   changeSettings(settings: UserSettings) {
     if (this.verifyCredentials()) {
@@ -1673,14 +1708,12 @@ class UserSettings {
 
 ```ts
 class UserAuth {
-  constructor(private readonly user: User) {
-  }
+  constructor(private readonly user: User) {}
 
   verifyCredentials() {
     // ...
   }
 }
-
 
 class UserSettings {
   private readonly auth: UserAuth;
@@ -1723,8 +1756,7 @@ class NodeAdapter extends Adapter {
 }
 
 class HttpRequester {
-  constructor(private readonly adapter: Adapter) {
-  }
+  constructor(private readonly adapter: Adapter) {}
 
   async fetch<T>(url: string): Promise<T> {
     if (this.adapter instanceof AjaxAdapter) {
@@ -1760,7 +1792,7 @@ class AjaxAdapter extends Adapter {
     super();
   }
 
-  async request<T>(url: string): Promise<T>{
+  async request<T>(url: string): Promise<T> {
     // request and return promise
   }
 
@@ -1772,7 +1804,7 @@ class NodeAdapter extends Adapter {
     super();
   }
 
-  async request<T>(url: string): Promise<T>{
+  async request<T>(url: string): Promise<T> {
     // request and return promise
   }
 
@@ -1780,8 +1812,7 @@ class NodeAdapter extends Adapter {
 }
 
 class HttpRequester {
-  constructor(private readonly adapter: Adapter) {
-  }
+  constructor(private readonly adapter: Adapter) {}
 
   async fetch<T>(url: string): Promise<T> {
     const response = await this.adapter.request<T>(url);
@@ -1804,9 +1835,8 @@ Giải thích dễ hiểu nhất cho điều nay là, nếu bạn có một lớ
 class Rectangle {
   constructor(
     protected width: number = 0,
-    protected height: number = 0) {
-
-  }
+    protected height: number = 0,
+  ) {}
 
   setColor(color: string): this {
     // ...
@@ -1847,10 +1877,7 @@ class Square extends Rectangle {
 
 function renderLargeRectangles(rectangles: Rectangle[]) {
   rectangles.forEach((rectangle) => {
-    const area = rectangle
-      .setWidth(4)
-      .setHeight(5)
-      .getArea(); // Lỗi: Nếu đối tượng là area là Square, giá trị trả lại sẽ là 25. Kết quả mong muốn là 20
+    const area = rectangle.setWidth(4).setHeight(5).getArea(); // Lỗi: Nếu đối tượng là area là Square, giá trị trả lại sẽ là 25. Kết quả mong muốn là 20
     rectangle.render(area);
   });
 }
@@ -1877,7 +1904,8 @@ abstract class Shape {
 class Rectangle extends Shape {
   constructor(
     private readonly width = 0,
-    private readonly height = 0) {
+    private readonly height = 0,
+  ) {
     super();
   }
 
@@ -2116,7 +2144,7 @@ Kiểm thử tốt tuân theo các quy tắc sau:
 
 - **Có thể lặp lại(Repeatable)** Các kiểm thử có thể được lặp lại ở bất kỳ môi trường nào và không có lý do gì làm chúng không đạt(fail).
 
-- **Tự kiểm chứng(Self-Validating)** Một kiểm thử sẽ trả lời bằng *Đạt* hoặc *Không đạt*. Bạn không cần so sánh các tệp nhật ký để trả lời một kiểm thử đã *đạt*.
+- **Tự kiểm chứng(Self-Validating)** Một kiểm thử sẽ trả lời bằng _Đạt_ hoặc _Không đạt_. Bạn không cần so sánh các tệp nhật ký để trả lời một kiểm thử đã _đạt_.
 
 - **Xảy ra đúng lúc(Timely)** Kiểm thử đơn vị nên được viết trước logic code. Nếu bạn viết kiểm thử sau logic code, bạn có thể sẽ thấy việc viết kiểm thử lúc này là quá khó.
 
@@ -2124,7 +2152,7 @@ Kiểm thử tốt tuân theo các quy tắc sau:
 
 ### Kiểm thử một điều kiện trên mỗi test
 
-Kiểm thử cũng nên được thiết kế theo nguyên tắc *Trách nhiện duy nhất*. Chỉ kiểm tra một điều kiện trên mỗi kiểm thử đơn vị.
+Kiểm thử cũng nên được thiết kế theo nguyên tắc _Trách nhiện duy nhất_. Chỉ kiểm tra một điều kiện trên mỗi kiểm thử đơn vị.
 
 **Chưa tốt:**
 
@@ -2210,7 +2238,7 @@ describe('Calendar', () => {
 
 ### Ưu tiên Promise hơn Callback
 
-Callback không rõ ràng, và chúng gây ra các đoạn mã lồng nhau quá nhiều - *(Địa ngục callback - The callback hell)*.
+Callback không rõ ràng, và chúng gây ra các đoạn mã lồng nhau quá nhiều - _(Địa ngục callback - The callback hell)_.
 
 Có nhiều tiện ích giúp cho việc chuyển đổi các hàm đang sử dụng phong cách callback thành các hàm trả về promise(với Node.js chúng ta có [`util.promisify`](https://nodejs.org/dist/latest-v8.x/docs/api/util.html#util_util_promisify_original), dùng chung cho JavaScript chúng ta có [pify](https://www.npmjs.com/package/pify), [es6-promisify](https://www.npmjs.com/package/es6-promisify))
 
@@ -2255,26 +2283,25 @@ import { promisify } from 'util';
 const write = promisify(writeFile);
 
 function downloadPage(url: string, saveTo: string): Promise<string> {
-  return get(url)
-    .then(response => write(saveTo, response));
+  return get(url).then((response) => write(saveTo, response));
 }
 
 downloadPage('https://en.wikipedia.org/wiki/Robert_Cecil_Martin', 'article.html')
-  .then(content => console.log(content))
-  .catch(error => console.error(error));
+  .then((content) => console.log(content))
+  .catch((error) => console.error(error));
 ```
 
 Promise hỗ trợ một vài phương thức giúp các đoạn mã ngắn gọn hơn:
 
-| Phương thức              | Mô tả                                      |
-| ------------------------ | -----------------------------------------  |
-| `Promise.resolve(value)` | Chuyển đổi một giá trị thành một resolved promise.   |
-| `Promise.reject(error)`  | Chuyển đổi một giá trị thành một rejected promise.   |
-| `Promise.all(promises)`  | Trả về một promise mới, thực hiện "đồng loạt" các `promises` được truyền vào. Giá trị của promise mới là mảng các giá trị của các `promises` hoặc sẽ nhận giá trị rejected là giá trị của promise đầu tiên trả về rejected.  |
-| `Promise.race(promises)`| Trả về một promise mới, với kết quả/lỗi là kết quả/lỗi của promise trong mảng `promises` trả về đầu tiên(sớm nhất). |
+| Phương thức              | Mô tả                                                                                                                                                                                                                       |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Promise.resolve(value)` | Chuyển đổi một giá trị thành một resolved promise.                                                                                                                                                                          |
+| `Promise.reject(error)`  | Chuyển đổi một giá trị thành một rejected promise.                                                                                                                                                                          |
+| `Promise.all(promises)`  | Trả về một promise mới, thực hiện "đồng loạt" các `promises` được truyền vào. Giá trị của promise mới là mảng các giá trị của các `promises` hoặc sẽ nhận giá trị rejected là giá trị của promise đầu tiên trả về rejected. |
+| `Promise.race(promises)` | Trả về một promise mới, với kết quả/lỗi là kết quả/lỗi của promise trong mảng `promises` trả về đầu tiên(sớm nhất).                                                                                                         |
 
 `Promise.all` Đặc biệt hữu ích khi muốn các tác vụ được chạy song song.
- `Promise.race` Giúp tạo ra các giới hạn thời gian thực thi cho các promise một cách dễ dàng.
+`Promise.race` Giúp tạo ra các giới hạn thời gian thực thi cho các promise một cách dễ dàng.
 
 **[⬆ Trở lại đầu trang](#mục-lục)**
 
@@ -2292,12 +2319,12 @@ import { promisify } from 'util';
 const write = util.promisify(writeFile);
 
 function downloadPage(url: string, saveTo: string): Promise<string> {
-  return get(url).then(response => write(saveTo, response));
+  return get(url).then((response) => write(saveTo, response));
 }
 
 downloadPage('https://en.wikipedia.org/wiki/Robert_Cecil_Martin', 'article.html')
-  .then(content => console.log(content))
-  .catch(error => console.error(error));
+  .then((content) => console.log(content))
+  .catch((error) => console.error(error));
 ```
 
 **Tốt:**
@@ -2374,8 +2401,8 @@ Ngoài ra có một cách khác giúp không sử dụng cú pháp `throw` - Lu�
 Xem xét ví dụ sau:
 
 ```ts
-type Result<R> = { isError: false, value: R };
-type Failure<E> = { isError: true, error: E };
+type Result<R> = { isError: false; value: R };
+type Failure<E> = { isError: true; error: E };
 type Failable<R, E> = Result<R> | Failure<E>;
 
 function calculateTotal(items: Item[]): Failable<number, 'empty'> {
@@ -2418,7 +2445,7 @@ try {
 **Tốt:**
 
 ```ts
-import { logger } from './logging'
+import { logger } from './logging';
 
 try {
   functionThatMightThrow();
@@ -2448,7 +2475,7 @@ getUser()
 **Good:**
 
 ```ts
-import { logger } from './logging'
+import { logger } from './logging';
 
 getUser()
   .then((user: User) => {
@@ -2472,7 +2499,7 @@ try {
 
 ## Định dạng
 
-Định dạng là một vấn đề chủ quan. Giống như nhiều quy tắc trong tài liêu này, không có quy tắc cứng nhắc hay bền vững nào mà bạn phải tuân theo. Điểm mấu chốt là *Không tranh luận(ARGUE)* khi xem xét các định dạng. Có rất nhiều công cụ để tự động hóa việc kiểm tra định dạng. Hãy chọn một công cụ cho dự án của bạn! Thật lãng phí thời gian và tiền bạc để các kỹ sư tranh luận về định dạng. Quy tắc chung phải tuân theo là *giữ cho các quy tắc định dạng nhất quán*.
+Định dạng là một vấn đề chủ quan. Giống như nhiều quy tắc trong tài liêu này, không có quy tắc cứng nhắc hay bền vững nào mà bạn phải tuân theo. Điểm mấu chốt là _Không tranh luận(ARGUE)_ khi xem xét các định dạng. Có rất nhiều công cụ để tự động hóa việc kiểm tra định dạng. Hãy chọn một công cụ cho dự án của bạn! Thật lãng phí thời gian và tiền bạc để các kỹ sư tranh luận về định dạng. Quy tắc chung phải tuân theo là _giữ cho các quy tắc định dạng nhất quán_.
 
 Với TypeScript chúng ta có một công cụ rất mạnh cho việc này - [TSLint](https://palantir.github.io/tslint/). Đây là một công cụ phân tích tĩnh, nó có thể giúp bạn cải thiện đáng kể chất lượng mã của bạn. Nếu bạn đã cài đặt TSLint, thì đây là một số cấu hình có sẵn bạn có thể tham khảo cho các dự án của mình:
 
@@ -2494,7 +2521,7 @@ Một nguồn tham khảo tuyệt vời [TypeScript StyleGuide and Coding Conven
 
 ### Nhất quán khi sử dụng viết hoa
 
-Việc viết hoa cho bạn biết rất nhiều về các biến , hàm...của bạn. Những quy tắc này mang tính chủ quan, nhóm của bạn có thể tùy chọn nó. Vấn đề là, bất kể bạn chọn gì, chỉ cần *nhất quán*.
+Việc viết hoa cho bạn biết rất nhiều về các biến , hàm...của bạn. Những quy tắc này mang tính chủ quan, nhóm của bạn có thể tùy chọn nó. Vấn đề là, bất kể bạn chọn gì, chỉ cần _nhất quán_.
 
 **Chưa tốt:**
 
@@ -2508,8 +2535,12 @@ const Artists = ['ACDC', 'Led Zeppelin', 'The Beatles'];
 function eraseDatabase() {}
 function restore_database() {}
 
-type animal = { /* ... */ }
-type Container = { /* ... */ }
+type animal = {
+  /* ... */
+};
+type Container = {
+  /* ... */
+};
 ```
 
 **Good:**
@@ -2524,8 +2555,12 @@ const ARTISTS = ['ACDC', 'Led Zeppelin', 'The Beatles'];
 function eraseDatabase() {}
 function restoreDatabase() {}
 
-type Animal = { /* ... */ }
-type Container = { /* ... */ }
+type Animal = {
+  /* ... */
+};
+type Container = {
+  /* ... */
+};
 ```
 
 Ưu tiên sử dụng `PascalCase` cho tên lớp, interface, kiểu và tên của các không gian tên(namespace).
@@ -2544,8 +2579,7 @@ Chúng ta có xu hướng đọc mã từ trên xuống, như khi đọc báo. V
 
 ```ts
 class PerformanceReview {
-  constructor(private readonly employee: Employee) {
-  }
+  constructor(private readonly employee: Employee) {}
 
   private lookupPeers() {
     return db.lookup(this.employee.id, 'peers');
@@ -2585,8 +2619,7 @@ review.review();
 
 ```ts
 class PerformanceReview {
-  constructor(private readonly employee: Employee) {
-  }
+  constructor(private readonly employee: Employee) {}
 
   review() {
     this.getPeerReviews();
@@ -2709,26 +2742,29 @@ import { UserService } from '@services/UserService';
 Việc sử dụng các dòng chú thích là một dấu hiệu của sự thất bại của việc thể hiện ý nghĩa của các dòng mã. Các đoạn mã phải là nơi duy nhất cung cấp sự thật.
 
 > Don’t comment bad code—rewrite it.
-> — *Brian W. Kernighan and P. J. Plaugher*
+> — _Brian W. Kernighan and P. J. Plaugher_
 
 > Dịch: Đừng cố giải thích những dòng mã chưa tốt, hãy viết lại chúng.
 
 ### Ưu tiên việc các đoạn mã tự giải thích chính nó thay vì sử dụng các chú thích
 
-Các đoạn chú thích như một thứ tồi tệ, không phải một thủ tục. Các đoạn mã tốt *hầu hết* tự viết tài liệu cho chính nó.
+Các đoạn chú thích như một thứ tồi tệ, không phải một thủ tục. Các đoạn mã tốt _hầu hết_ tự viết tài liệu cho chính nó.
 
 **Chưa tốt:**
 
 ```ts
 // Check if subscription is active.
-if (subscription.endDate > Date.now()) {  }
+if (subscription.endDate > Date.now()) {
+}
 ```
 
 **Tốt:**
 
 ```ts
 const isSubscriptionActive = subscription.endDate > Date.now();
-if (isSubscriptionActive) { /* ... */ }
+if (isSubscriptionActive) {
+  /* ... */
+}
 ```
 
 **[⬆ Trở lại đầu trang](#mục-lục)**
@@ -2745,7 +2781,7 @@ type User = {
   email: string;
   // age: number;
   // jobPosition: string;
-}
+};
 ```
 
 **Tốt:**
@@ -2754,7 +2790,7 @@ type User = {
 type User = {
   name: string;
   email: string;
-}
+};
 ```
 
 **[⬆ Trở lại đầu trang](#mục-lục)**
@@ -2822,7 +2858,7 @@ class Client {
   private describeContact(): string {
     // ...
   }
-};
+}
 ```
 
 **Tốt:**
@@ -2845,7 +2881,7 @@ class Client {
   private describeContact(): string {
     // ...
   }
-};
+}
 ```
 
 **[⬆ Trở lại đầu trang](#mục-lục)**
@@ -2854,7 +2890,7 @@ class Client {
 
 Khi bạn thấy cần để lại những ghi chú trong mã cho một số cải tiến, chỉnh sửa sau này, hãy làm điều đó bằng cách sử dụng chú thích kiểu `// TODO`. Hầu hết các IDE đều hỗ trợ cho kiểu chú thích đó, bạn có thể nhanh chóng liệt kê toàn bộ các `todo`.
 
-Tuy nhiên, hãy nhớ chú thích kiểu *TODO* không phải là lý do để các đoạn mã xấu tồn tại.
+Tuy nhiên, hãy nhớ chú thích kiểu _TODO_ không phải là lý do để các đoạn mã xấu tồn tại.
 
 **Chưa tốt:**
 

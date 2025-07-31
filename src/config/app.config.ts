@@ -70,7 +70,8 @@ class EnvironmentVariablesValidator {
 }
 
 export default registerAs<AppConfig>('app', () => {
-  console.info(`Register AppConfig from environment variables`);
+  console.log('Loading app configuration...');
+
   validateConfig(process.env, EnvironmentVariablesValidator);
 
   const port = process.env.APP_PORT
@@ -83,6 +84,8 @@ export default registerAs<AppConfig>('app', () => {
     nodeEnv: process.env.NODE_ENV || Environment.DEVELOPMENT,
     name: process.env.APP_NAME || 'app',
     url: process.env.APP_URL || `http://localhost:${port}`,
+    frontendUrl: process.env.FRONTEND_URL || `http://localhost:${port}`,
+    frontendDomain: process.env.FRONTEND_DOMAIN || `localhost`,
     port,
     debug: process.env.APP_DEBUG === 'true',
     apiPrefix: process.env.API_PREFIX || 'api',

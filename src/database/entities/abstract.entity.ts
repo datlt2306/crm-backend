@@ -1,17 +1,23 @@
+import { Uuid } from '@/common/types/common.type';
+import { getOrder, Order } from '@/database/decorators/order.decorator';
 import { plainToInstance } from 'class-transformer';
+import { RequestContextService } from 'src/services/request-context.service';
 import {
   BaseEntity,
+  BeforeInsert,
   Column,
   CreateDateColumn,
   DataSource,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { getOrder, Order } from '../decorators/order.decorator';
 
 export abstract class AbstractEntity extends BaseEntity {
+  @PrimaryGeneratedColumn('uuid', { primaryKeyConstraintName: 'PK_user_id' })
+  id!: Uuid;
+
   @Order(9999)
   @CreateDateColumn({
-    name: 'created_at',
     type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
     nullable: false,
@@ -20,7 +26,6 @@ export abstract class AbstractEntity extends BaseEntity {
 
   @Order(9999)
   @Column({
-    name: 'created_by',
     type: 'varchar',
     nullable: false,
   })
@@ -28,20 +33,12 @@ export abstract class AbstractEntity extends BaseEntity {
 
   @Order(9999)
   @UpdateDateColumn({
-    name: 'updated_at',
     type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
+    onUpdate: 'CURRENT_TIMESTAMP',
     nullable: false,
   })
   updatedAt: Date;
-
-  @Order(9999)
-  @Column({
-    name: 'updated_by',
-    type: 'varchar',
-    nullable: false,
-  })
-  updatedBy: string;
 
   toDto<Dto>(dtoClass: new () => Dto): Dto {
     return plainToInstance(dtoClass, this);
@@ -58,5 +55,11 @@ export abstract class AbstractEntity extends BaseEntity {
         return orderX - orderY;
       });
     }
+  }
+
+  @BeforeInsert()
+  setCreatedBy() {
+    const user = RequestContextService.get('user') || 'anonymous';
+    this.createdBy = user?.id ? user.id.toString() : 'anonymous';
   }
 }

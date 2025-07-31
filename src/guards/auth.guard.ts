@@ -1,4 +1,5 @@
 import { AuthService } from '@/api/auth/auth.service';
+import { UserService } from '@/api/users/user.service';
 import { IS_AUTH_OPTIONAL, IS_PUBLIC } from '@/constants/app.constant';
 import {
   CanActivate,
@@ -14,6 +15,7 @@ export class AuthGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
     private authService: AuthService,
+    private userService: UserService, // Assuming UserService is injected to fetch user data
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -30,7 +32,7 @@ export class AuthGuard implements CanActivate {
     );
 
     const request = context.switchToHttp().getRequest();
-    const accessToken = this.extractTokenFromHeader(request);
+    const accessToken = this.extractToken(request);
 
     if (isAuthOptional && !accessToken) {
       return true;
@@ -41,11 +43,27 @@ export class AuthGuard implements CanActivate {
 
     request['user'] = await this.authService.verifyAccessToken(accessToken);
 
+    const email = request['user']?.email;
+    if (!email) {
+      throw new UnauthorizedException();
+    }
+
+    const userData = await this.userService.findOneByEmail(email);
+
+    if (!userData) {
+      throw new UnauthorizedException();
+    }
+
     return true;
   }
 
-  private extractTokenFromHeader(request: Request): string | undefined {
+  private extractToken(request: Request): string | undefined {
     const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    return type === 'Bearer' ? token : undefined;
+    if (type === 'Bearer' && token) {
+      return token;
+    }
+    console.log('Extracting token from cookies', token);
+
+    return request.cookies ? request.cookies.accessToken : undefined;
   }
 }

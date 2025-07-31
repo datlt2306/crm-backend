@@ -1,10 +1,10 @@
 export type AuthConfig = {
-  secret: string;
-  expires: string;
-  refreshSecret: string;
-  refreshExpires: string;
-  forgotSecret: string;
-  forgotExpires: string;
-  confirmEmailSecret: string;
-  confirmEmailExpires: string;
+  jwtSecret: string;
+  jwtExpiresIn: string;
+  jwtRefreshSecret: string;
+  jwtRefreshExpiresIn: string;
+  googleClientId: string;
+  googleClientSecret: string;
+  googleCallbackUrl: string;
+  googleScope: string[];
 };

@@ -8,7 +8,6 @@ import {
 import {
   ApiBasicAuth,
   ApiBearerAuth,
-  ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
   ApiResponse,
@@ -16,7 +15,7 @@ import {
 } from '@nestjs/swagger';
 import { STATUS_CODES } from 'http';
 import { Public } from './public.decorator';
-import { ApiPaginatedResponse } from './swagger.decorators';
+import { ApiCustomResponse, ApiPaginatedResponse } from './swagger.decorators';
 
 type ApiResponseType = number;
 type ApiAuthType = 'basic' | 'api-key' | 'jwt';
@@ -115,8 +114,8 @@ export const ApiAuth = (options: IApiAuthOptions = {}): MethodDecorator => {
     HttpCode(options.statusCode || defaultStatusCode),
     isPaginated
       ? ApiPaginatedResponse(ok)
-      : options.statusCode === 201
-        ? ApiCreatedResponse(ok)
+      : options.type
+        ? ApiCustomResponse(ok)
         : ApiOkResponse(ok),
     ...authDecorators,
     ...errorResponses,

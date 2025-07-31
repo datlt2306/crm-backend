@@ -1,84 +1,162 @@
-import { CurrentUser } from '@/decorators/current-user.decorator';
+import { AuthService } from '@/api/auth/auth.service';
+import { UserResDto } from '@/api/users/dto/user.res.dto';
+import { UserEntity } from '@/api/users/entities/user.entity';
+import { UserService } from '@/api/users/user.service';
+import { ResponseDto } from '@/common/dto/response/response.dto';
+import { AllConfigType } from '@/config/config.type';
+import { ErrorCode } from '@/constants/error-code.constant';
 import { ApiAuth, ApiPublic } from '@/decorators/http.decorators';
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Get,
+  Req,
+  Res,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { AuthGuard } from '@nestjs/passport';
 import { ApiTags } from '@nestjs/swagger';
-import { AuthService } from './auth.service';
-import { LoginReqDto } from './dto/login.req.dto';
-import { LoginResDto } from './dto/login.res.dto';
-import { RefreshReqDto } from './dto/refresh.req.dto';
-import { RefreshResDto } from './dto/refresh.res.dto';
-import { RegisterReqDto } from './dto/register.req.dto';
-import { RegisterResDto } from './dto/register.res.dto';
-import { JwtPayloadType } from './types/jwt-payload.type';
+import { plainToInstance } from 'class-transformer';
+import { CookieOptions, Request, Response } from 'express';
 
 @ApiTags('auth')
-@Controller({
-  path: 'auth',
-  version: '1',
-})
+@Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly configService: ConfigService<AllConfigType>,
+    private readonly userService: UserService,
+  ) {}
 
-  @ApiPublic({
-    type: LoginResDto,
-    summary: 'Sign in',
-  })
-  @Post('email/login')
-  async signIn(@Body() userLogin: LoginReqDto): Promise<LoginResDto> {
-    return await this.authService.signIn(userLogin);
+  /**
+   * Get cookie configuration based on environment and origin
+   */
+  private getCookieConfig(origin?: string): CookieOptions {
+    const isProduction =
+      this.configService.getOrThrow('app.nodeEnv', {
+        infer: true,
+      }) === 'production';
+
+    const frontendUrl = this.configService.getOrThrow('app.frontendUrl', {
+      infer: true,
+    });
+
+    // Check if origin is localhost
+    const isLocalhost =
+      origin?.includes('localhost') || origin?.includes('127.0.0.1');
+
+    const isSameDomain =
+      origin &&
+      frontendUrl &&
+      new URL(origin).hostname === new URL(frontendUrl).hostname;
+
+    const config: CookieOptions = {
+      httpOnly: true,
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      secure: false,
+      sameSite: 'lax',
+    };
+
+    if (isLocalhost) {
+      // Local development
+      config.secure = false;
+      config.sameSite = 'lax';
+    } else if (isSameDomain) {
+      // Same domain in production
+      config.secure = isProduction;
+      config.sameSite = 'lax';
+    } else {
+      // Cross-domain in production
+      config.secure = true; // Required for sameSite: 'none'
+      config.sameSite = 'none'; // Required for cross-domain
+    }
+
+    return config;
   }
 
   @ApiPublic()
-  @Post('email/register')
-  async register(@Body() dto: RegisterReqDto): Promise<RegisterResDto> {
-    return await this.authService.register(dto);
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  async googleAuth() {
+    // Guard redirects to Google
+  }
+
+  @ApiPublic()
+  @Get('google/callback')
+  @UseGuards(AuthGuard('google'))
+  async googleAuthCallback(@Req() req: Request, @Res() res: Response) {
+    const frontendUrl = this.configService.getOrThrow('app.frontendUrl', {
+      infer: true,
+    });
+
+    const response = req.user as {
+      data: UserEntity;
+      success: boolean;
+    };
+
+    if (!response.success) {
+      res.redirect(`${frontendUrl}/login?error=${ErrorCode.E003}`);
+    }
+
+    const origin = req.get('origin') || req.get('referer');
+    const cookieConfig = this.getCookieConfig(origin);
+
+    const accessToken = this.authService.generateJwt(response.data);
+
+    res.cookie('accessToken', accessToken, cookieConfig);
+
+    res.redirect(frontendUrl);
+  }
+
+  @ApiPublic()
+  @Delete('logout')
+  async logout(@Req() req: Request, @Res() res: Response) {
+    const origin = req.get('origin');
+    const cookieConfig = this.getCookieConfig(origin);
+
+    // Clear cookies with same config they were set with
+    res.clearCookie('accessToken', {
+      httpOnly: cookieConfig.httpOnly,
+      secure: cookieConfig.secure,
+      sameSite: cookieConfig.sameSite,
+      path: cookieConfig.path,
+    });
+
+    return res.json({
+      success: true,
+      message: 'Logout successful',
+    });
   }
 
   @ApiAuth({
-    summary: 'Logout',
-    errorResponses: [400, 401, 403, 500],
+    summary: 'Get current user',
+    description: 'Returns the current authenticated user information.',
   })
-  @Post('logout')
-  async logout(@CurrentUser() userToken: JwtPayloadType): Promise<void> {
-    await this.authService.logout(userToken);
-  }
+  @Get('me')
+  async getMe(@Req() req: Request) {
+    const user = req.user as UserEntity;
 
-  @ApiPublic({
-    type: RefreshResDto,
-    summary: 'Refresh token',
-  })
-  @Post('refresh')
-  async refresh(@Body() dto: RefreshReqDto): Promise<RefreshResDto> {
-    return await this.authService.refreshToken(dto);
-  }
+    const email = user?.email;
+    if (!email) {
+      throw new UnauthorizedException('Email not found in user data');
+    }
 
-  @ApiPublic()
-  @Post('forgot-password')
-  async forgotPassword() {
-    return 'forgot-password';
-  }
+    const userData = await this.userService.findOneByEmail(email);
 
-  @ApiPublic()
-  @Post('verify/forgot-password')
-  async verifyForgotPassword() {
-    return 'verify-forgot-password';
-  }
+    if (!userData) {
+      throw new UnauthorizedException('User not found');
+    }
 
-  @ApiPublic()
-  @Post('reset-password')
-  async resetPassword() {
-    return 'reset-password';
-  }
+    // return userData;
 
-  @ApiPublic()
-  @Get('verify/email')
-  async verifyEmail() {
-    return 'verify-email';
-  }
-
-  @ApiPublic()
-  @Post('verify/email/resend')
-  async resendVerifyEmail() {
-    return 'resend-verify-email';
+    return new ResponseDto<UserResDto>({
+      data: plainToInstance(UserResDto, userData, {
+        excludeExtraneousValues: true,
+      }),
+      message: 'User retrieved successfully',
+    });
   }
 }
