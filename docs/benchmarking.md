@@ -7,6 +7,8 @@
 ## Apache Benchmark
 
 ```bash
+
+# TOKEN: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjczMmFhOWQ2LTg2M2MtNGJkZC1hNjc2LTRiZTc2ZTUzNzE0NiIsImVtYWlsIjoiYmluaHBoYW4uZGV2QGdtYWlsLmNvbSIsInJvbGUiOiJDTkJNIiwiaWF0IjoxNzU0MTIwNTU4LCJleHAiOjE3NTQyMDY5NTh9.oPNUxw0X2Aa6i7EXKntJ_49u-C1v5jXkeQSHGLoj3l-emLD6Dr_PJFP4TlquHZnt6-8Sz6tAZrPOtvihDM3Daqxi1gv7KeoMK7SqXxbNz-oZDFwRqXXb-lFtTBAUznGElnYC2VU_ncAAgIikby8BoMSUv1SXiUgZ6RjUKv1JrFgDxQf82Yp6z8ZmWvyQnEoMzzQGXM0XP6XPbJ3cvCJb-3Kn5hVuWzSg8Fz0SiKq2rSvygJLWzJk7rhjMiK_G1Ajzi7qY5J11iU6sNheqALumR5jZ3wxQwvz5OmxoVeIBhP0PJIypy1yJQKDdg9jpwcxADQex2S0esd6i79V07qUQg
 docker run --rm jordi/ab -n 100 -c 100 -T application/json -H "Authorization: Bearer USER_TOKEN" -v 2 http://<server_ip>:3000/api/v1/users/me
 ```
 

@@ -49,6 +49,21 @@ export class ActivityEntity extends AbstractEntity {
   @Column({ type: 'boolean', default: false })
   mandatory: boolean;
 
+  @Column({ type: 'int', nullable: true })
+  estimateTime?: number; // minutes
+
+  @Column({ type: 'uuid', nullable: true })
+  parentId?: string;
+
+  @ManyToOne(() => ActivityEntity, (activity) => activity.subActivities, {
+    nullable: true,
+  })
+  @JoinColumn({ name: 'parentId' })
+  parent?: ActivityEntity;
+
+  @OneToMany(() => ActivityEntity, (activity) => activity.parent)
+  subActivities: ActivityEntity[];
+
   @Column({ type: 'enum', enum: ActivityCategory, nullable: true })
   category?: ActivityCategory;
   @Column({ type: 'enum', enum: ActivityStatus, default: ActivityStatus.NEW })

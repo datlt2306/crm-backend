@@ -1,6 +1,5 @@
-import { PartialType } from '@nestjs/swagger';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { CreateSemesterDto } from './create-semester.dto';
-import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateSemesterDto extends PartialType(CreateSemesterDto) {
   @ApiProperty({

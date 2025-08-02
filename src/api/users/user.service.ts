@@ -1,4 +1,3 @@
-import { PageOptionsDto } from '@/common/dto/offset-pagination/page-options.dto';
 import { OffsetPaginatedDto } from '@/common/dto/offset-pagination/paginated.dto';
 import { ResponseDto } from '@/common/dto/response/response.dto';
 import { Uuid } from '@/common/types/common.type';
@@ -8,6 +7,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
+import { QueryUserDto } from './dto/query-user.tdo';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { UserResDto } from './dto/user.res.dto';
 import { UserEntity } from './entities/user.entity';
 
@@ -29,9 +30,26 @@ export class UserService {
     });
   }
 
-  async findAll(
-    reqDto: PageOptionsDto,
-  ): Promise<OffsetPaginatedDto<UserResDto>> {
+  async findOne(id: Uuid): Promise<ResponseDto<UserResDto | null>> {
+    const user = await this.userRepository.findOne({
+      where: { id, isActive: true },
+    });
+
+    if (!user)
+      return new ResponseDto({
+        data: null,
+        message: 'Người dùng không tồn tại',
+      });
+
+    return new ResponseDto({
+      data: plainToInstance(UserResDto, user, {
+        excludeExtraneousValues: true,
+      }),
+      message: 'Lấy người dùng thành công',
+    });
+  }
+
+  async findAll(reqDto: QueryUserDto): Promise<OffsetPaginatedDto<UserResDto>> {
     const query = this.userRepository
       .createQueryBuilder('user')
       .where('user.isActive = :isActive', { isActive: true });
@@ -46,6 +64,16 @@ export class UserService {
       query.orderBy(`user.name`, reqDto.order);
     }
 
+    if (reqDto.role) {
+      query.andWhere('user.role = :role', { role: reqDto.role });
+    }
+
+    if (reqDto.isActive !== undefined) {
+      query.andWhere('user.isActive = :isActive', {
+        isActive: reqDto.isActive,
+      });
+    }
+
     const [users, metaDto] = await paginate<UserEntity>(query, reqDto, {
       skipCount: false,
       takeAll: false,
@@ -56,7 +84,7 @@ export class UserService {
         excludeExtraneousValues: true,
       }),
       meta: metaDto,
-      message: 'Users retrieved successfully',
+      message: 'Lấy danh sách người dùng thành công',
     });
   }
 
@@ -69,9 +97,14 @@ export class UserService {
     });
   }
 
-  async remove(id: Uuid) {
+  async remove(id: Uuid): Promise<ResponseDto<void>> {
     await this.userRepository.findOneByOrFail({ id });
-    await this.userRepository.softDelete(id);
+    await this.userRepository.delete(id);
+
+    return new ResponseDto({
+      data: null,
+      message: 'Xóa người dùng thành công',
+    });
   }
 
   async importUsers(file: Express.Multer.File): Promise<ResponseDto<void>> {
@@ -84,5 +117,26 @@ export class UserService {
     // const records =
 
     // return;
+  }
+
+  async update(id: Uuid, dto: UpdateUserDto): Promise<ResponseDto<UserResDto>> {
+    const user = await this.userRepository.findOneByOrFail({ id });
+
+    if (!user) {
+      return new ResponseDto({
+        data: null,
+        message: 'User not found',
+      });
+    }
+
+    Object.assign(user, dto);
+    await this.userRepository.save(user);
+
+    return new ResponseDto({
+      data: plainToInstance(UserResDto, user, {
+        excludeExtraneousValues: true,
+      }),
+      message: 'Cập nhật người dùng thành công',
+    });
   }
 }

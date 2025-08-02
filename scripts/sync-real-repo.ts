@@ -1,6 +1,6 @@
 import { execSync } from 'child_process';
 
-const REAL_REPO = 'https://github.com/datlt2306/crm-backend.git'; // sửa lại repo thật
+const REAL_REPO = 'https://github.com/datlt2306/crm-backend.git';
 const BRANCH = execSync('git rev-parse --abbrev-ref HEAD').toString().trim();
 
 console.log(`Sync code to real repo: ${REAL_REPO} (${BRANCH})`);

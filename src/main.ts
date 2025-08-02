@@ -55,31 +55,9 @@ async function bootstrap() {
   const configService = app.get(ConfigService<AllConfigType>);
   const reflector = app.get(Reflector);
 
-  const isProduction =
-    configService.getOrThrow('app.nodeEnv', {
-      infer: true,
-    }) === 'production';
   const corsOrigin = configService.getOrThrow('app.corsOrigin', {
     infer: true,
   });
-
-  console.info('Environment:', isProduction ? 'production' : 'development');
-  console.info('CORS Origin:', corsOrigin);
-
-  // app.enableCors({
-  //   origin: corsOrigin,
-  //   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  //   allowedHeaders: [
-  //     'Content-Type',
-  //     'Authorization',
-  //     'X-Requested-With',
-  //     'Accept',
-  //     'Origin',
-  //     'X-CSRF-Token',
-  //   ],
-  //   credentials: true,
-  //   exposedHeaders: ['Set-Cookie'],
-  // });
 
   app.enableCors({
     origin: (origin, callback) => {
@@ -112,14 +90,6 @@ async function bootstrap() {
     exposedHeaders: ['Set-Cookie'],
     optionsSuccessStatus: 200, // IE11 support
     preflightContinue: false,
-  });
-
-  app.use((req, res, next) => {
-    if (req.method === 'OPTIONS') {
-      res.header('Access-Control-Allow-Methods', 'true');
-    }
-
-    next();
   });
 
   // Use global prefix if you don't have subdomain

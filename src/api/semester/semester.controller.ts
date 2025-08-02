@@ -52,6 +52,7 @@ export class SemesterController {
   @ApiPublic({
     summary: 'Lấy thông tin học kỳ theo ID',
     description: 'OK',
+    type: SemesterResDto,
   })
   @ApiResponse({ status: 200, type: SemesterResDto })
   @ApiParam({

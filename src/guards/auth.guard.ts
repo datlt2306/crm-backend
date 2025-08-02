@@ -62,8 +62,6 @@ export class AuthGuard implements CanActivate {
     if (type === 'Bearer' && token) {
       return token;
     }
-    console.log('Extracting token from cookies', token);
-
     return request.cookies ? request.cookies.accessToken : undefined;
   }
 }

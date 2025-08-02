@@ -53,6 +53,22 @@ export class ActivityResDto {
   @Expose()
   endTime?: Date;
 
+  @ApiProperty({
+    example: 120,
+    required: false,
+    description: 'Ước lượng thời gian (phút)',
+  })
+  @Expose()
+  estimateTime?: number;
+
+  @ApiProperty({
+    example: 'parent-activity-uuid',
+    required: false,
+    description: 'ID activity cha (nếu là sub-activity)',
+  })
+  @Expose()
+  parentId?: string;
+
   @ApiProperty({ example: 'Phòng 101', required: false })
   @Expose()
   location?: string;
@@ -119,4 +135,14 @@ export class ActivityResDto {
   @Expose()
   @Type(() => SemesterResDto)
   semester?: SemesterResDto;
+
+  @ApiProperty({ type: () => ActivityResDto, required: false })
+  @Expose()
+  @Type(() => ActivityResDto)
+  parent?: ActivityResDto;
+
+  @ApiProperty({ type: () => [ActivityResDto], required: false })
+  @Expose()
+  @Type(() => ActivityResDto)
+  subActivities?: ActivityResDto[];
 }
